@@ -49,7 +49,7 @@ if (navBurger) {
     navLinks.style.top = '80px';
     navLinks.style.left = '0';
     navLinks.style.right = '0';
-    navLinks.style.background = 'rgba(245,240,232,0.98)';
+    navLinks.style.background = '#551516';
     navLinks.style.padding = '24px 48px';
     navLinks.style.gap = '20px';
   });
