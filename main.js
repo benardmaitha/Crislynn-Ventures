@@ -21,7 +21,188 @@ const revealObserver = new IntersectionObserver((entries) => {
 }, { threshold: 0.1 });
 reveals.forEach(el => revealObserver.observe(el));
 
-// ── ITINERARY TOGGLE ──
+/* =========================================
+   EXPERIENCE SLIDER
+========================================= */
+
+document.querySelectorAll(".exp-slider").forEach(slider=>{
+
+const cards=slider.querySelector(".exp-cards");
+const card=slider.querySelector(".exp-card");
+const left=slider.querySelector(".left");
+const right=slider.querySelector(".right");
+
+const gap=20;
+const visible=3;
+
+let index=0;
+let startX=0;
+let isDown=false;
+
+const total=cards.children.length;
+
+/* create dots */
+
+const dotsContainer=document.createElement("div");
+dotsContainer.className="exp-dots";
+
+for(let i=0;i<total-visible+1;i++){
+
+const dot=document.createElement("div");
+dot.className="exp-dot";
+
+if(i===0) dot.classList.add("active");
+
+dotsContainer.appendChild(dot);
+
+}
+
+slider.appendChild(dotsContainer);
+
+const dots=dotsContainer.querySelectorAll(".exp-dot");
+
+
+function updateSlider(){
+
+const cardWidth=card.offsetWidth+gap;
+
+cards.style.transform=`translateX(${-index*cardWidth}px)`;
+
+/* update dots */
+
+dots.forEach(d=>d.classList.remove("active"));
+if(dots[index]) dots[index].classList.add("active");
+
+/* scale cards */
+
+const allCards=slider.querySelectorAll(".exp-card");
+
+allCards.forEach(c=>{
+c.classList.remove("big","small");
+});
+
+if(allCards[index+1]){
+allCards[index+1].classList.add("big");
+}
+
+if(allCards[index]){
+allCards[index].classList.add("small");
+}
+
+if(allCards[index+2]){
+allCards[index+2].classList.add("small");
+}
+
+}
+
+/* arrows */
+
+left.onclick=()=>{
+index--;
+if(index<0) index=0;
+updateSlider();
+}
+
+right.onclick=()=>{
+index++;
+if(index>total-visible) index=total-visible;
+updateSlider();
+}
+
+/* drag */
+
+cards.addEventListener("mousedown",e=>{
+isDown=true;
+startX=e.pageX;
+});
+
+document.addEventListener("mouseup",()=>{
+isDown=false;
+});
+
+document.addEventListener("mousemove",e=>{
+
+if(!isDown) return;
+
+const move=e.pageX-startX;
+
+if(move>100){
+index--;
+if(index<0) index=0;
+updateSlider();
+isDown=false;
+}
+
+if(move<-100){
+index++;
+if(index>total-visible) index=total-visible;
+updateSlider();
+isDown=false;
+}
+
+});
+
+/* touch */
+
+cards.addEventListener("touchstart",e=>{
+startX=e.touches[0].clientX;
+});
+
+cards.addEventListener("touchend",e=>{
+
+let endX=e.changedTouches[0].clientX;
+let move=endX-startX;
+
+if(move>60){
+index--;
+if(index<0) index=0;
+}
+
+if(move<-60){
+index++;
+if(index>total-visible) index=total-visible;
+}
+
+updateSlider();
+
+});
+
+/* initial state */
+
+updateSlider();
+
+});
+
+
+/* =========================================
+   CLICKABLE CARDS
+========================================= */
+
+document.querySelectorAll(".exp-card").forEach(card=>{
+
+card.addEventListener("click",()=>{
+
+const link=card.querySelector(".exp-link");
+
+if(!link) return;
+
+const data={
+title:link.dataset.title,
+image:link.dataset.image,
+video:link.dataset.video,
+desc:link.dataset.desc
+};
+
+localStorage.setItem("selectedExperience",JSON.stringify(data));
+
+window.location.href = link.getAttribute("href");
+
+});
+
+});
+
+/* 
+── ITINERARY TOGGLE ──
 function toggleItinerary(btn) {
   const itinerary = btn.nextElementSibling;
   const isOpen = itinerary.classList.contains('open');
@@ -36,6 +217,7 @@ function toggleItinerary(btn) {
     btn.textContent = 'Close ×';
   }
 }
+  */
 
 // ── MOBILE NAV ──
 const navBurger = document.getElementById('navBurger');
