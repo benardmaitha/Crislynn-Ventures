@@ -21,157 +21,6 @@ const revealObserver = new IntersectionObserver((entries) => {
 }, { threshold: 0.1 });
 reveals.forEach(el => revealObserver.observe(el));
 
-/* =========================================
-   EXPERIENCE SLIDER
-========================================= */
-
-document.querySelectorAll(".exp-slider").forEach(slider=>{
-
-const cards=slider.querySelector(".exp-cards");
-const card=slider.querySelector(".exp-card");
-const left=slider.querySelector(".left");
-const right=slider.querySelector(".right");
-
-const gap=20;
-const visible=3;
-
-let index=0;
-let startX=0;
-let isDown=false;
-
-const total=cards.children.length;
-
-/* create dots */
-
-const dotsContainer=document.createElement("div");
-dotsContainer.className="exp-dots";
-
-for(let i=0;i<total-visible+1;i++){
-
-const dot=document.createElement("div");
-dot.className="exp-dot";
-
-if(i===0) dot.classList.add("active");
-
-dotsContainer.appendChild(dot);
-
-}
-
-slider.appendChild(dotsContainer);
-
-const dots=dotsContainer.querySelectorAll(".exp-dot");
-
-
-function updateSlider(){
-
-const cardWidth=card.offsetWidth+gap;
-
-cards.style.transform=`translateX(${-index*cardWidth}px)`;
-
-/* update dots */
-
-dots.forEach(d=>d.classList.remove("active"));
-if(dots[index]) dots[index].classList.add("active");
-
-/* scale cards */
-
-const allCards=slider.querySelectorAll(".exp-card");
-
-allCards.forEach(c=>{
-c.classList.remove("big","small");
-});
-
-if(allCards[index+1]){
-allCards[index+1].classList.add("big");
-}
-
-if(allCards[index]){
-allCards[index].classList.add("small");
-}
-
-if(allCards[index+2]){
-allCards[index+2].classList.add("small");
-}
-
-}
-
-/* arrows */
-
-left.onclick=()=>{
-index--;
-if(index<0) index=0;
-updateSlider();
-}
-
-right.onclick=()=>{
-index++;
-if(index>total-visible) index=total-visible;
-updateSlider();
-}
-
-/* drag */
-
-cards.addEventListener("mousedown",e=>{
-isDown=true;
-startX=e.pageX;
-});
-
-document.addEventListener("mouseup",()=>{
-isDown=false;
-});
-
-document.addEventListener("mousemove",e=>{
-
-if(!isDown) return;
-
-const move=e.pageX-startX;
-
-if(move>100){
-index--;
-if(index<0) index=0;
-updateSlider();
-isDown=false;
-}
-
-if(move<-100){
-index++;
-if(index>total-visible) index=total-visible;
-updateSlider();
-isDown=false;
-}
-
-});
-
-/* touch */
-
-cards.addEventListener("touchstart",e=>{
-startX=e.touches[0].clientX;
-});
-
-cards.addEventListener("touchend",e=>{
-
-let endX=e.changedTouches[0].clientX;
-let move=endX-startX;
-
-if(move>60){
-index--;
-if(index<0) index=0;
-}
-
-if(move<-60){
-index++;
-if(index>total-visible) index=total-visible;
-}
-
-updateSlider();
-
-});
-
-/* initial state */
-
-updateSlider();
-
-});
 
 
 /* =========================================
@@ -200,24 +49,6 @@ window.location.href = link.getAttribute("href");
 });
 
 });
-
-/* 
-── ITINERARY TOGGLE ──
-function toggleItinerary(btn) {
-  const itinerary = btn.nextElementSibling;
-  const isOpen = itinerary.classList.contains('open');
-  // Close all open itineraries
-  document.querySelectorAll('.exp-itinerary.open').forEach(el => {
-    el.classList.remove('open');
-    el.previousElementSibling.textContent = 'View Itinerary ›';
-  });
-  // Open clicked one if it was closed
-  if (!isOpen) {
-    itinerary.classList.add('open');
-    btn.textContent = 'Close ×';
-  }
-}
-  */
 
 // ── MOBILE NAV ──
 const navBurger = document.getElementById('navBurger');
@@ -250,3 +81,515 @@ function handleSubmit(e) {
     btn.disabled = false;
   }, 4000);
 }
+
+/* ═══════════════════════════════════════════════════════════
+   ABOUT SECTION — Script
+   Paste just before your closing </body> tag,
+   or add to your existing JS file.
+═══════════════════════════════════════════════════════════ */
+
+(function () {
+
+  /* ── 1. Scroll-reveal: add .about-visible when section enters viewport ── */
+  const aboutSection = document.getElementById('about');
+  if (!aboutSection) return;
+
+  const sectionObserver = new IntersectionObserver(
+    function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          aboutSection.classList.add('about-visible');
+          sectionObserver.unobserve(aboutSection);
+          startCounters();   // fire counters once visible
+        }
+      });
+    },
+    { threshold: 0.18 }
+  );
+  sectionObserver.observe(aboutSection);
+
+
+  /* ── 2. Story slide rotation ── */
+  const slides    = aboutSection.querySelectorAll('.about-slide');
+  const dots      = aboutSection.querySelectorAll('.about-dot');
+  let   current   = 0;
+  let   autoTimer = null;
+
+  function showSlide(idx) {
+    slides.forEach(function (s, i) {
+      s.classList.toggle('active', i === idx);
+    });
+    dots.forEach(function (d, i) {
+      d.classList.toggle('active', i === idx);
+    });
+    current = idx;
+  }
+
+  function nextSlide() {
+    showSlide((current + 1) % slides.length);
+  }
+
+  function startAuto() {
+    clearInterval(autoTimer);
+    autoTimer = setInterval(nextSlide, 4500);
+  }
+
+  // Dot click
+  dots.forEach(function (dot) {
+    dot.addEventListener('click', function () {
+      var idx = parseInt(dot.getAttribute('data-slide'), 10);
+      showSlide(idx);
+      startAuto(); // reset timer on manual click
+    });
+  });
+
+  startAuto();
+
+
+  /* ── 3. Animated counters (ease-out, fire once) ── */
+  var countersDone = false;
+
+  function startCounters() {
+    if (countersDone) return;
+    countersDone = true;
+
+    var counters = aboutSection.querySelectorAll('.counter');
+    counters.forEach(function (el) {
+      var target   = parseInt(el.getAttribute('data-target'), 10);
+      var duration = 1800; // ms
+      var start    = null;
+
+      function easeOut(t) {
+        return 1 - Math.pow(1 - t, 3); // cubic ease-out
+      }
+
+      function step(timestamp) {
+        if (!start) start = timestamp;
+        var progress = Math.min((timestamp - start) / duration, 1);
+        el.textContent = Math.floor(easeOut(progress) * target);
+        if (progress < 1) {
+          requestAnimationFrame(step);
+        } else {
+          el.textContent = target;
+        }
+      }
+
+      // Small delay so counters start after the stat block fades in (~0.9s)
+      setTimeout(function () {
+        requestAnimationFrame(step);
+      }, 950);
+    });
+  }
+
+})();
+
+/* ════════════════════════════════════════════════════
+   EXPERIENCES SECTION — Luxury v4 Script
+   No side arrows · fixed card height · equal padding
+   Paste before </body> or merge into main.js
+════════════════════════════════════════════════════ */
+
+(function () {
+
+  var CARD_W   = 290;
+  var CARD_GAP = 18;
+  var STEP     = CARD_W + CARD_GAP;
+
+  var state = [
+    { idx:0, dragging:false, startX:0, scrollStart:0 },
+    { idx:0, dragging:false, startX:0, scrollStart:0 },
+    { idx:0, dragging:false, startX:0, scrollStart:0 },
+  ];
+
+  function getTrack(cat)     { return document.getElementById('track-' + cat); }
+  function getCardCount(cat) { var t = getTrack(cat); return t ? t.querySelectorAll('.exp-card').length : 0; }
+  function getVisible(cat) {
+    var t = getTrack(cat); if (!t) return 1;
+    return Math.max(1, Math.floor((t.clientWidth - 120) / STEP));
+  }
+
+  /* Progress bar */
+  function updateProgress(cat) {
+    var bar = document.getElementById('prog-' + cat); if (!bar) return;
+    var max = Math.max(1, getCardCount(cat) - getVisible(cat));
+    var pct = max > 0 ? ((state[cat].idx / max) * 75 + 25) : 100;
+    bar.style.width = pct + '%';
+  }
+
+  /* Dots */
+  function buildDots(cat) {
+    var el = document.getElementById('dots-' + cat); if (!el) return;
+    el.innerHTML = '';
+    for (var i = 0; i < getCardCount(cat); i++) {
+      var d = document.createElement('div');
+      d.className = 'exp-dot' + (i === 0 ? ' active' : '');
+      (function(idx){ d.addEventListener('click', function(){ goTo(cat, idx); }); })(i);
+      el.appendChild(d);
+    }
+  }
+
+  function updateDots(cat) {
+    document.querySelectorAll('#dots-' + cat + ' .exp-dot').forEach(function(d,i){
+      d.classList.toggle('active', i === state[cat].idx);
+    });
+  }
+
+  /* Navigation */
+  function goTo(cat, idx) {
+    var max = getCardCount(cat) - getVisible(cat);
+    idx = Math.max(0, Math.min(idx, max));
+    state[cat].idx = idx;
+    var t = getTrack(cat);
+    t.scrollTo({ left: idx * STEP, behavior: 'smooth' });
+    updateDots(cat);
+    updateProgress(cat);
+  }
+
+  /* Exposed for possible external use */
+  window.slide = function(cat, dir){ goTo(cat, state[cat].idx + dir); };
+
+  /* Mouse drag */
+  window.dragStart = function(e, cat){
+    if (window.innerWidth <= 600) return;
+    state[cat].dragging = true; state[cat].startX = e.pageX;
+    state[cat].scrollStart = getTrack(cat).scrollLeft;
+    getTrack(cat).classList.add('dragging');
+  };
+  window.dragMove = function(e, cat){
+    if (!state[cat].dragging) return; e.preventDefault();
+    getTrack(cat).scrollLeft = state[cat].scrollStart - (e.pageX - state[cat].startX);
+  };
+  window.dragEnd = function(cat){
+    if (!state[cat].dragging) return;
+    state[cat].dragging = false;
+    getTrack(cat).classList.remove('dragging');
+    goTo(cat, Math.round((getTrack(cat).scrollLeft / STEP)));
+  };
+
+  /* Touch */
+  window.touchStart = function(e, cat){
+    state[cat].startX = e.touches[0].pageX;
+    state[cat].scrollStart = getTrack(cat).scrollLeft;
+    state[cat].dragging = true;
+  };
+  window.touchMove = function(e, cat){
+    if (!state[cat].dragging) return;
+    getTrack(cat).scrollLeft = state[cat].scrollStart - (e.touches[0].pageX - state[cat].startX);
+  };
+
+  /* Sync on native scroll */
+  [0,1,2].forEach(function(cat){
+    var t = getTrack(cat); if (!t) return;
+    var tick = false;
+    t.addEventListener('scroll', function(){
+      if (!tick) {
+        requestAnimationFrame(function(){
+          var idx = Math.round((t.scrollLeft) / STEP);
+          if (state[cat].idx !== idx){ state[cat].idx = idx; updateDots(cat); updateProgress(cat); }
+          tick = false;
+        });
+        tick = true;
+      }
+    });
+  });
+
+  /* 3D tilt (desktop only) */
+  window.tiltCard = function(e, card){
+    if (window.innerWidth <= 600) return;
+    var r = card.getBoundingClientRect();
+    var dx = (e.clientX - (r.left + r.width/2))  / (r.width/2);
+    var dy = (e.clientY - (r.top  + r.height/2)) / (r.height/2);
+    card.style.transform   = 'perspective(1200px) rotateX('+(-dy*5)+'deg) rotateY('+(dx*5)+'deg) translateZ(8px)';
+    card.style.transition  = 'box-shadow 0.3s, transform 0.08s ease';
+  };
+  window.resetTilt = function(card){
+    card.style.transform  = 'perspective(1200px) rotateX(0) rotateY(0) translateZ(0)';
+    card.style.transition = 'box-shadow 0.5s, transform 0.5s ease';
+  };
+
+  /* Custom drag cursor */
+  var section = document.getElementById('experiences');
+
+  /* Tab ink + scroll-spy */
+  var tabs = document.querySelectorAll('.exp-tab');
+  var ink  = document.getElementById('expTabInk');
+
+  function moveInk(tab){
+    if (!ink || !tab) return;
+    ink.style.left  = tab.offsetLeft + 'px';
+    ink.style.width = tab.offsetWidth + 'px';
+  }
+
+  tabs.forEach(function(tab){
+    tab.addEventListener('click', function(){
+      tabs.forEach(function(t){ t.classList.remove('active'); });
+      tab.classList.add('active'); moveInk(tab);
+    });
+  });
+
+  requestAnimationFrame(function(){
+    var a = document.querySelector('.exp-tab.active');
+    if (a) moveInk(a);
+  });
+
+  window.expScrollTo = function(idx){
+    var cat = document.getElementById('expCat' + idx);
+    if (!cat) return;
+    window.scrollTo({ top: cat.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' });
+    tabs.forEach(function(t,i){ t.classList.toggle('active', i === idx); });
+    moveInk(tabs[idx]);
+  };
+
+  var catEls = [0,1,2].map(function(i){ return document.getElementById('expCat'+i); });
+  window.addEventListener('scroll', function(){
+    catEls.forEach(function(el,i){
+      if (!el) return;
+      var r = el.getBoundingClientRect();
+      if (r.top <= 160 && r.bottom > 160){
+        tabs.forEach(function(t,ti){ t.classList.toggle('active', ti===i); });
+        if (tabs[i]) moveInk(tabs[i]);
+      }
+    });
+  }, { passive:true });
+
+  /* Scroll reveal */
+  if (section) {
+    new IntersectionObserver(function(e,o){ if(e[0].isIntersecting){ section.classList.add('exp-in'); o.disconnect(); }},{ threshold:0.06 }).observe(section);
+  }
+  document.querySelectorAll('.exp-category').forEach(function(el){
+    new IntersectionObserver(function(e,o){ if(e[0].isIntersecting){ el.classList.add('exp-cat-in'); o.disconnect(); }},{ threshold:0.1 }).observe(el);
+  });
+
+  /* Init */
+  [0,1,2].forEach(function(cat){ buildDots(cat); updateProgress(cat); });
+
+})();
+
+/* ════════════════════════════════════════════════════
+   CONTACT SECTION — Script
+   Paste just before </body> or merge into your JS.
+
+   EMAIL DELIVERY via FormSubmit.co (free, no backend):
+   1. On the very first real submission, FormSubmit sends
+      a confirmation email to karibu@crislynnventures.co.ke
+   2. Click the activation link once.
+   3. Done — every submission arrives as a clean table:
+      Full Name | Email | Phone | Dates | Experience |
+      Guests | Dream Journey Details | How They Heard
+════════════════════════════════════════════════════ */
+
+(function () {
+
+  var section = document.getElementById('contact');
+  if (!section) return;
+
+  /* ── Scroll reveal ── */
+  new IntersectionObserver(function (entries, obs) {
+    if (entries[0].isIntersecting) {
+      section.classList.add('ct-in');
+      obs.disconnect();
+    }
+  }, { threshold: 0.1 }).observe(section);
+
+
+  /* ── Experience tile selection ── */
+  var tiles   = section.querySelectorAll('.ct-tile');
+  var expHid  = document.getElementById('ctExp');
+
+  tiles.forEach(function (tile) {
+    tile.addEventListener('click', function () {
+      tiles.forEach(function (t) { t.classList.remove('ct-sel'); });
+      tile.classList.add('ct-sel');
+      if (expHid) expHid.value = tile.getAttribute('data-value');
+      var wrap = document.getElementById('ctTiles');
+      if (wrap) wrap.classList.remove('ct-err');
+    });
+  });
+
+
+  /* ── Guest counter ── */
+  var gCount = 2;
+
+  window.ctAdjGuests = function (d) {
+    gCount = Math.max(1, Math.min(50, gCount + d));
+    var valEl = document.getElementById('ctGuestVal');
+    var hidEl = document.getElementById('ctGuestsH');
+    if (valEl) {
+      valEl.textContent = gCount;
+      valEl.classList.add('ct-bump');
+      setTimeout(function () { valEl.classList.remove('ct-bump'); }, 200);
+    }
+    if (hidEl) hidEl.value = gCount + (gCount === 1 ? ' guest' : ' guests');
+  };
+
+
+  /* ── Step navigation ── */
+  function setStep(n) {
+    var p1   = document.getElementById('ctPanel1');
+    var p2   = document.getElementById('ctPanel2');
+    var fill = document.getElementById('ctFill');
+    var lbl  = document.getElementById('ctStepLbl');
+
+    if (n === 1) {
+      if (p2) p2.classList.add('ct-step-panel--hidden');
+      if (p1) { p1.classList.remove('ct-step-panel--hidden'); p1.style.animation = 'none'; p1.offsetHeight; p1.style.animation = ''; }
+      if (fill) fill.style.width = '50%';
+      if (lbl)  lbl.textContent  = '01 / 02';
+    } else {
+      if (p1) p1.classList.add('ct-step-panel--hidden');
+      if (p2) { p2.classList.remove('ct-step-panel--hidden'); p2.style.animation = 'none'; p2.offsetHeight; p2.style.animation = ''; }
+      if (fill) fill.style.width = '100%';
+      if (lbl)  lbl.textContent  = '02 / 02';
+      /* Scroll form top into view on mobile */
+      var card = section.querySelector('.ct-form-card');
+      if (card && window.innerWidth < 960) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  }
+
+  window.ctNext = function () {
+    var nameEl  = document.getElementById('ctName');
+    var emailEl = document.getElementById('ctEmail');
+    var expEl   = document.getElementById('ctExp');
+    var valid   = true;
+
+    /* Validate name */
+    if (!nameEl || !nameEl.value.trim()) {
+      markErr(nameEl); valid = false;
+    } else { clearErr(nameEl); }
+
+    /* Validate email */
+    if (!emailEl || !emailEl.value.trim() || !/\S+@\S+\.\S+/.test(emailEl.value)) {
+      markErr(emailEl); valid = false;
+    } else { clearErr(emailEl); }
+
+    /* Validate experience selection */
+    if (!expEl || !expEl.value) {
+      var wrap = document.getElementById('ctTiles');
+      if (wrap) { wrap.classList.add('ct-err'); wrap.style.animation = 'none'; wrap.offsetHeight; wrap.style.animation = ''; }
+      valid = false;
+    }
+
+    if (valid) setStep(2);
+  };
+
+  window.ctBack = function () { setStep(1); };
+
+  function markErr(input) {
+    if (!input) return;
+    var field = input.closest('.ct-field');
+    if (field) {
+      field.classList.add('ct-err');
+      field.style.animation = 'none';
+      field.offsetHeight;
+      field.style.animation = '';
+    }
+    input.addEventListener('input', function () { clearErr(input); }, { once: true });
+  }
+
+  function clearErr(input) {
+    if (!input) return;
+    var field = input.closest('.ct-field');
+    if (field) field.classList.remove('ct-err');
+  }
+
+
+  /* ── Form submission ── */
+  var form = document.getElementById('ctForm');
+  if (form) {
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      /* Validate step 2 message */
+      var msgEl = document.getElementById('ctMsg');
+      if (!msgEl || !msgEl.value.trim()) {
+        markErr(msgEl); return;
+      }
+
+      var btn   = document.getElementById('ctSubBtn');
+      var label = document.getElementById('ctSubLbl');
+      if (btn)   btn.classList.add('ct-loading');
+      if (label) label.textContent = 'Sending…';
+
+      fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: { 'Accept': 'application/json' }
+      })
+      .then(function (res) {
+        /* FormSubmit returns a redirect — treat any response as success */
+        showSuccess();
+      })
+      .catch(function () {
+        /* Network fallback — let the browser POST normally */
+        form.submit();
+      });
+    });
+  }
+
+
+  /* ── Success screen ── */
+  function showSuccess() {
+    var formEl = document.getElementById('ctForm');
+    var sucEl  = document.getElementById('ctSuccess');
+    var fill   = document.getElementById('ctFill');
+    var lbl    = document.getElementById('ctStepLbl');
+    if (formEl) formEl.style.display = 'none';
+    if (sucEl)  sucEl.classList.add('ct-show');
+    if (fill)   fill.style.width = '100%';
+    if (lbl)    lbl.textContent  = 'Complete';
+  }
+
+  window.ctReset = function () {
+    var formEl = document.getElementById('ctForm');
+    var sucEl  = document.getElementById('ctSuccess');
+    if (formEl) { formEl.reset(); formEl.style.display = ''; }
+    if (sucEl)  sucEl.classList.remove('ct-show');
+
+    /* Clear tiles */
+    tiles.forEach(function (t) { t.classList.remove('ct-sel'); });
+    if (expHid) expHid.value = '';
+
+    /* Reset guests */
+    gCount = 2;
+    ctAdjGuests(0);
+
+    setStep(1);
+  };
+
+})();
+
+/* ════════════════════════════════════════════════
+   FOOTER — Scroll reveal
+   Paste before </body> or merge into main.js
+════════════════════════════════════════════════ */
+
+(function () {
+  var footer = document.getElementById('footer');
+  if (!footer) return;
+
+  new IntersectionObserver(function (entries, obs) {
+    if (entries[0].isIntersecting) {
+      footer.classList.add('ft-in');
+      obs.disconnect();
+    }
+  }, { threshold: 0.08 }).observe(footer);
+})();
+
+/* ════════════════════════════════════════════
+   SERVICES SECTION — Scroll reveal
+   Paste before </body> or merge into main.js
+════════════════════════════════════════════ */
+
+(function () {
+  var section = document.getElementById('services');
+  if (!section) return;
+
+  new IntersectionObserver(function (entries, obs) {
+    if (entries[0].isIntersecting) {
+      section.classList.add('sv-in');
+      obs.disconnect();
+    }
+  }, { threshold: 0.12 }).observe(section);
+})();

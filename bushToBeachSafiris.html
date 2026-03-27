@@ -2,150 +2,1682 @@
 <html lang="en">
 
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tsavo East One-Day Safari</title>
 
-<title>Experience</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=DM+Sans:wght@300;400&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600&display=swap" rel="stylesheet">
 
 <style>
 
-body{
-margin:0;
-font-family:'DM Sans',sans-serif;
+/* ─── RESET & ROOT ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --red:        #551516;
+  --red-dark:   #3d0f10;
+  --gold:       #a7703a;
+  --gold-light: #c4914f;
+  --cream:      #F7F2EA;
+  --cream-soft: #f0ebe0;
+  --white:      #ffffff;
+  --gray:       rgba(255,255,255,.45);
+  --gray-dim:   rgba(255,255,255,.22);
+  --radius:     16px;
+  --nav-h:      72px;
 }
 
-.exp-hero{
-height:90vh;
-display:flex;
-align-items:center;
-justify-content:center;
-color:white;
-text-align:center;
-position:relative;
-overflow:hidden;
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--cream-soft);
+  color: #2c2c2c;
+  overflow-x: hidden;
 }
 
-/* video behaves like background */
+/* NAVBAR */
 
-.exp-hero video{
-position:absolute;
-top:0;
-left:0;
-width:100%;
-height:100%;
-object-fit:cover;
-z-index:0;
-display:none;
+#navbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 48px;
+  height: var(--nav-h);
+  transition: background .4s, box-shadow .4s;
 }
 
-/* image behaves like background */
-
-.exp-hero img{
-position:absolute;
-top:0;
-left:0;
-width:100%;
-height:100%;
-object-fit:cover;
-z-index:0;
-display:none;
+#navbar.scrolled {
+  background: #551516;
+  box-shadow: 0 1px 0px #a7703a;
+  backdrop-filter: blur(8px);
 }
 
-/* ✨ smooth fade effect */
+.nav-logo img {
+  height: 50px;
+  width: auto;
+  object-fit: contain;
+  display: block;
+}
 
-.exp-hero video,
-.exp-hero img{
-transition: opacity 0.6s ease;
+/* fallback text logo if image fails */
+.nav-logo-fallback {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: var(--cream);
+  letter-spacing: .04em;
+  text-decoration: none;
+  display: none;
+}
+
+.nav-logo img:not([src]),
+.nav-logo img[src=""] {
+  display: none;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+
+.nav-links li a {
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: .014em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: #faf9f8;
+  transition: color 0.3s;
+}
+
+nav.scrolled .nav-links a { color: #a7703a; }
+.nav-links :hover a { color: #551516; }
+
+.nav-links li a.nav-cta {
+  background: #a7703a;
+  color: var(--white) !important;
+  padding: 12px 24px;
+  font-size: 11px !important;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  font-weight: 500;
+  transition: background 0.3s !important;
+}
+
+.nav-links li a.nav-cta:hover {
+  background: var(--gold-light);
+}
+
+/* Burger */
+.nav-burger {
+  width: 28px;
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.nav-burger:hover { background: rgba(167,112,58,.15); }
+
+.nav-burger span {
+  display: block;
+  width: 22px;
+  height: 1.5px;
+  background: #551516;
+  transition: background 0.4s;
+}
+
+nav.scrolled .nav-burger span { background: var(--text-mid); }
+
+/* Mobile nav open state */
+.nav-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-burger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.nav-burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* Mobile dropdown */
+.nav-mobile {
+  display: none;
+  position: fixed;
+  top: var(--nav-h);
+  left: 0; right: 0;
+  background: rgba(61,15,16,0.98);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(167,112,58,.25);
+  padding: 20px 28px 28px;
+  z-index: 999;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nav-mobile.open { display: flex; }
+
+.nav-mobile a {
+  font-family: 'DM Sans', sans-serif;
+  font-size: .95rem;
+  font-weight: 400;
+  color: rgba(247,242,234,.85);
+  text-decoration: none;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border-bottom: 1px solid rgba(167,112,58,.12);
+  transition: background .2s, color .2s;
+}
+
+.nav-mobile a:last-child { border-bottom: none; }
+
+.nav-mobile a:hover {
+  background: rgba(167,112,58,.15);
+  color: var(--cream);
+}
+
+.nav-mobile a.nav-cta-mobile {
+  background: var(--gold);
+  color: var(--white);
+  font-weight: 500;
+  text-align: center;
+  margin-top: 8px;
+  border: none;
+}
+
+.nav-mobile a.nav-cta-mobile:hover { background: var(--gold-light); }
+
+@media (max-width: 860px) {
+  #navbar { padding: 0 24px; }
+  .nav-links { display: none; }
+  .nav-burger { display: flex; }
+}
+
+/* HERO */
+
+.exp-hero {
+  position: relative;
+  height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-align: center;
+  overflow: hidden;
+}
+
+/* video bg */
+#heroVideo {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  object-fit: fill; z-index: 0;
+  display: none;
+  opacity: 0;
+  transition: opacity .6s ease;
+}
+#heroVideo.active {
+  display: block;
+  opacity: 1;
+}
+
+/* image bg */
+#heroImage {
+  position: absolute; top: 0; left: 0;
+  width: 100%; height: 100%;
+  object-fit: fill; z-index: 0;
+  display: none;
+  opacity: 0;
+  transition: opacity .6s ease;
+}
+#heroImage.active {
+  display: block;
+  opacity: 1;
+}
+
+/* fallback gradient always behind everything */
+.hero-fallback-bg {
+  position: absolute; inset: 0;
+  background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+  z-index: 0;
 }
 
 /* overlay */
-
-.exp-hero::after{
-content:"";
-position:absolute;
-inset:0;
-background:rgba(0,0,0,.35);
-z-index:1;
+.exp-hero::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(85,21,22,.55) 0%,
+    rgba(0,0,0,.42) 100%
+  );
+  z-index: 1;
 }
 
-/* text */
-
-.exp-hero-inner{
-position:relative;
-z-index:2;
-max-width:700px;
+/* inner content */
+.exp-hero-inner {
+  position: relative; z-index: 2;
+  max-width: 720px; padding: 0 24px;
 }
+
+.exp-hero-inner h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.6rem, 6vw, 5rem);
+  font-weight: 400; line-height: 1.1;
+  letter-spacing: -.02em; margin-bottom: .85rem;
+  text-shadow: 0 2px 24px rgba(0,0,0,.35);
+}
+
+.exp-hero-inner h1 em {
+  font-style: italic;
+  color: var(--gold-light);
+}
+
+.exp-hero-inner p {
+  font-size: 1.08rem; font-weight: 300;
+  opacity: .9; line-height: 1.65;
+  text-shadow: 0 1px 10px rgba(0,0,0,.25);
+  max-width: 560px; margin: 0 auto;
+}
+
+/* optional tag badge */
+.exp-hero-tag {
+  display: inline-block;
+  background: rgba(167,112,58,.85);
+  color: var(--white);
+  font-size: .75rem; font-weight: 600;
+  letter-spacing: .08em; text-transform: uppercase;
+  padding: 5px 14px; border-radius: 99px;
+  margin-bottom: 18px;
+}
+
+/* loading shimmer for hero */
+.exp-hero.loading .exp-hero-inner h1 {
+  background: rgba(255,255,255,.15);
+  color: transparent;
+  border-radius: 6px;
+  animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+/* ─── PAGE BODY ─────────────────────────────────── */
+
+.page-wrap {
+  background: linear-gradient(180deg, var(--cream-soft) 0%, #e8dfd4 100%);
+}
+
+/* ─── SECTION HEADING ───────────────────────────── */
+
+.sec-head { margin-bottom: 2rem; }
+
+.sec-head h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(1.8rem, 3vw, 2.4rem);
+  font-weight: 400; letter-spacing: -.01em;
+  color: var(--red); margin-bottom: .5rem;
+}
+
+.sec-rule { display: flex; align-items: center; gap: 6px; }
+.sec-rule .bar { width: 44px; height: 3px; background: var(--gold); border-radius: 99px; }
+.sec-rule .dot { width: 7px; height: 7px; background: var(--gold-light); border-radius: 50%; opacity: .65; }
+
+/* ─── PANEL ─────────────────────────────────────── */
+
+.panel {
+  background: rgba(255,255,255,0.88);
+  backdrop-filter: blur(2px);
+  border: 1px solid rgba(167,112,58,.25);
+  border-radius: var(--radius);
+  padding: 40px;
+  margin: 28px 24px 0;
+  box-shadow: 0 8px 28px rgba(85,21,22,0.08);
+  transition: box-shadow 0.3s ease;
+}
+
+.panel:hover { box-shadow: 0 12px 32px rgba(85,21,22,0.12); }
+
+@media(max-width:600px) { .panel { padding: 26px 18px; margin: 20px 0 0; } }
+
+.panel-dark {
+  background: linear-gradient(135deg, rgba(85,21,22,0.92) 0%, rgba(61,15,16,0.94) 100%);
+  backdrop-filter: blur(2px);
+  border: 1px solid rgba(167,112,58,0.35);
+  border-radius: var(--radius);
+  padding: 40px;
+  margin: 28px 24px 0;
+  color: var(--cream);
+  box-shadow: 0 8px 28px rgba(85,21,22,0.2);
+}
+
+.panel-dark .sec-head h2 { color: var(--cream); }
+.panel-dark .overview-body p { color: rgba(247,242,234,0.85); }
+.panel-dark .ov-list li { color: rgba(247,242,234,0.8); }
+.panel-dark .itin-body h3 { color: var(--cream); }
+.panel-dark .itin-body p { color: rgba(247,242,234,0.75); }
+.panel-dark .itin-tag { border-color: rgba(167,112,58,0.45); color: rgba(247,242,234,0.7); }
+
+@media(max-width:600px) { .panel-dark { padding: 26px 18px; margin: 20px 0 0; } }
+
+/* ─── GALLERY ───────────────────────────────────── */
+
+.gallery-wrap { position: relative; margin-top: 28px; }
+
+.gallery-grid {
+  display: grid;
+  grid-template-columns: 1.65fr 1fr;
+  grid-template-rows: 240px 240px;
+  gap: 3px;
+}
+
+.g-cell { overflow: hidden; position: relative; cursor: pointer; }
+.g-cell.main { grid-row: 1 / 3; }
+
+.g-cell img {
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+  transition: transform .5s ease;
+}
+
+.g-cell:hover img { transform: scale(1.05); }
+
+.g-cell::after {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(85,21,22,0.2) 0%, rgba(167,112,58,0.15) 100%);
+  transition: background .3s; pointer-events: none;
+}
+
+.g-cell:hover::after { background: linear-gradient(135deg, rgba(85,21,22,0.05) 0%, rgba(167,112,58,0.05) 100%); }
+
+.g-cell.more-cell img { filter: brightness(.45) sepia(0.2); }
+
+.g-more-label {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.2rem; font-weight: 300;
+  color: white; z-index: 2; pointer-events: none;
+  text-shadow: 0 2px 15px rgba(0,0,0,0.5);
+}
+
+.gallery-view-btn {
+  position: absolute; bottom: 20px; left: 50%;
+  transform: translateX(-50%);
+  background: rgba(247,242,234,.95);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(167,112,58,0.3);
+  padding: 10px 24px; border-radius: 99px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: .88rem; font-weight: 500;
+  color: var(--red); cursor: pointer;
+  display: flex; align-items: center; gap: 8px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.25);
+  transition: all .2s ease;
+  z-index: 4; white-space: nowrap;
+}
+
+.gallery-view-btn:hover {
+  background: var(--white);
+  transform: translateX(-50%) translateY(-2px);
+  border-color: var(--gold);
+  box-shadow: 0 8px 24px rgba(0,0,0,.3);
+}
+
+/* ─── OVERVIEW ──────────────────────────────────── */
+
+.overview-body p { font-size: 1rem; line-height: 1.78; color: rgba(0,0,0,.75); margin-bottom: 1.5rem; }
+.overview-body p strong { color: var(--red); font-weight: 600; }
+.ov-list { list-style: none; display: flex; flex-direction: column; gap: 11px; }
+
+.ov-list li {
+  display: flex; align-items: flex-start; gap: 12px;
+  font-size: .97rem; line-height: 1.55; color: rgba(0,0,0,.7);
+}
+
+.ov-list li::before { content: "✦"; color: var(--gold); font-size: 1rem; margin-top: 0; }
+
+/* ─── EXPERIENCES GRID ──────────────────────────── */
+
+.exp-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+@media(max-width:700px) { .exp-grid { grid-template-columns: 1fr 1fr; } }
+@media(max-width:420px) { .exp-grid { grid-template-columns: 1fr; } }
+
+.exp-tile {
+  background: linear-gradient(135deg, rgba(247,242,234,0.95) 0%, rgba(240,235,224,0.95) 100%);
+  border: 1px solid rgba(167,112,58,.25);
+  border-radius: 13px; padding: 24px 20px 22px;
+  display: flex; flex-direction: column;
+  align-items: center; text-align: center; gap: 11px;
+  transition: all .25s ease;
+}
+
+.exp-tile:hover { border-color: var(--gold); transform: translateY(-4px); box-shadow: 0 12px 28px rgba(85,21,22,0.15); background: var(--cream); }
+.exp-tile-icon { width: 56px; height: 56px; border-radius: 13px; display: flex; align-items: center; justify-content: center; font-size: 1.7rem; }
+.ic-gold  { background: rgba(167,112,58,.15); }
+.ic-red   { background: rgba(85,21,22,.12); border: 1px solid rgba(167,112,58,.25); }
+.ic-cream { background: rgba(247,242,234,.8); }
+.exp-tile h3 { font-weight: 600; font-size: .97rem; color: var(--red); }
+.exp-tile p  { font-size: .84rem; color: rgba(0,0,0,.6); line-height: 1.55; }
+
+/* ─── ITINERARY ─────────────────────────────────── */
+
+.itin-list { display: flex; flex-direction: column; }
+
+.itin-row {
+  display: grid; grid-template-columns: 72px 1fr;
+  gap: 0 18px; position: relative;
+}
+
+.itin-row:not(:last-child)::after {
+  content: ""; position: absolute;
+  left: 33px; top: 50px;
+  width: 2px; height: calc(100% - 14px);
+  background: linear-gradient(180deg, var(--gold) 0%, rgba(167,112,58,0.3) 100%);
+}
+
+.itin-badge-col { padding-top: 2px; }
+
+.itin-badge {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+  color: white; font-size: .75rem; font-weight: 600;
+  letter-spacing: .04em; padding: 6px 10px;
+  border-radius: 99px; white-space: nowrap; display: inline-block;
+  box-shadow: 0 2px 8px rgba(167,112,58,0.3);
+}
+
+.itin-body { padding: 0 0 36px; }
+.itin-body h3 { font-weight: 600; font-size: 1.05rem; color: var(--red); margin-bottom: 7px; }
+.itin-body p  { font-size: .92rem; color: rgba(0,0,0,.65); line-height: 1.65; margin-bottom: 12px; }
+.itin-tags { display: flex; flex-wrap: wrap; gap: 7px; }
+
+.itin-tag {
+  border: 1px solid rgba(167,112,58,.35); color: rgba(0,0,0,.6);
+  font-size: .78rem; padding: 4px 12px; border-radius: 99px;
+  transition: all .2s; background: rgba(247,242,234,0.5);
+}
+
+.itin-tag:hover { border-color: var(--gold); color: var(--gold); background: rgba(247,242,234,0.8); }
+
+/* ─── LOCATION ──────────────────────────────────── */
+
+.loc-meta { font-size: .92rem; color: rgba(0,0,0,.6); margin-bottom: 18px; background: rgba(247,242,234,0.6); display: inline-block; padding: 6px 16px; border-radius: 99px; }
+
+.map-frame {
+  width: 100%; height: 380px;
+  border: 2px solid rgba(167,112,58,.2); border-radius: 12px;
+  overflow: hidden; display: block;
+  filter: brightness(.98) saturate(1.02); transition: all .3s;
+}
+
+.map-frame:hover { filter: brightness(1) saturate(1.05); border-color: rgba(167,112,58,.4); }
+
+/* ─── REVIEWS ───────────────────────────────────── */
+
+.reviews-summary { display: flex; align-items: center; gap: 20px; margin-bottom: 2rem; flex-wrap: wrap; }
+.score-big { font-family: 'Cormorant Garamond', serif; font-size: 4rem; font-weight: 300; line-height: 1; color: var(--red); }
+.score-right { display: flex; flex-direction: column; gap: 4px; }
+.stars { color: var(--gold); letter-spacing: 2px; font-size: 1.1rem; }
+.score-right span { font-size: .84rem; color: rgba(0,0,0,.5); }
+
+.reviews-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 14px; }
+@media(max-width:640px) { .reviews-grid { grid-template-columns: 1fr; } }
+
+.rv-card { background: rgba(247,242,234,.85); border: 1px solid rgba(167,112,58,.25); border-radius: 13px; padding: 22px; display: flex; flex-direction: column; gap: 10px; transition: all .2s; }
+.rv-card:hover { border-color: rgba(167,112,58,.6); background: rgba(247,242,234,.95); transform: translateY(-2px); }
+.rv-top { display: flex; align-items: center; gap: 12px; }
+.rv-avatar { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, rgba(167,112,58,.2) 0%, rgba(85,21,22,.15) 100%); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; border: 1px solid rgba(167,112,58,.3); }
+.rv-name  { font-weight: 600; font-size: .93rem; color: var(--red); }
+.rv-loc   { font-size: .78rem; color: rgba(0,0,0,.5); }
+.rv-stars { color: var(--gold); font-size: .88rem; }
+.rv-text  { font-size: .88rem; color: rgba(0,0,0,.7); line-height: 1.68; }
+.rv-date  { font-size: .75rem; color: rgba(0,0,0,.4); }
+
+/* ─── SIMILAR DESTINATIONS ──────────────────────── */
+
+.similar-section {
+  margin-top: 28px; padding: 40px 0 56px;
+  background: linear-gradient(135deg, var(--red) 0%, var(--red-dark) 100%);
+  border-top: 1px solid rgba(167,112,58,.3);
+  border-bottom: 1px solid rgba(167,112,58,.3);
+}
+
+.similar-section .sec-head h2 { color: var(--cream); }
+.similar-inner { padding: 0 24px; }
+
+.sim-cat-row { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; margin-top: 44px; }
+.sim-cat-row:first-of-type { margin-top: 0; }
+.sim-cat-eyebrow { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-weight: 300; color: var(--gold-light); opacity: .85; min-width: 32px; }
+.sim-cat-title { font-family: 'Cormorant Garamond', serif; font-size: 1.35rem; font-weight: 500; color: var(--cream); letter-spacing: .01em; }
+.sim-cat-line { flex: 1; height: 1px; background: linear-gradient(90deg, var(--gold) 0%, rgba(167,112,58,0.2) 100%); }
+
+.sim-slider-wrap { position: relative; }
+
+.sim-cards-track {
+  display: flex; gap: 16px;
+  overflow-x: auto; scroll-behavior: smooth;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 8px;
+}
+
+.sim-cards-track::-webkit-scrollbar { height: 6px; }
+.sim-cards-track::-webkit-scrollbar-track { background: rgba(247,242,234,0.2); border-radius: 10px; }
+.sim-cards-track::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+
+.sim-card {
+  flex: 0 0 calc(33.333% - 11px);
+  background: linear-gradient(135deg, rgba(61,15,16,0.85) 0%, rgba(85,21,22,0.85) 100%);
+  backdrop-filter: blur(2px);
+  border: 1px solid rgba(167,112,58,.35); border-radius: 14px; overflow: hidden;
+  cursor: pointer; transition: all .3s ease; text-decoration: none; color: inherit;
+  display: flex; flex-direction: column;
+}
+
+@media(max-width:800px) { .sim-card { flex: 0 0 calc(50% - 8px); } }
+@media(max-width:520px) { .sim-card { flex: 0 0 88vw; } }
+
+.sim-card:hover { transform: translateY(-5px); box-shadow: 0 16px 32px rgba(0,0,0,.3); border-color: var(--gold); }
+.sim-card-media { height: 190px; overflow: hidden; position: relative; }
+.sim-card-media img, .sim-card-media video { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s ease; }
+.sim-card:hover .sim-card-media img, .sim-card:hover .sim-card-media video { transform: scale(1.06); }
+.sim-card-body { padding: 18px 18px 20px; display: flex; flex-direction: column; flex: 1; }
+.sim-card-tag { font-size: .72rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--gold-light); margin-bottom: 7px; }
+.sim-card-body h4 { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; font-weight: 500; color: var(--cream); margin-bottom: 7px; line-height: 1.3; }
+.sim-card-body p { font-size: .84rem; color: rgba(247,242,234,.7); line-height: 1.55; flex: 1; }
+.sim-card-link { display: inline-block; margin-top: 14px; font-size: .82rem; font-weight: 500; color: var(--gold-light); letter-spacing: .02em; }
+
+.sim-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(85,21,22,.9); border: 1px solid var(--gold); color: white; width: 40px; height: 40px; border-radius: 50%; font-size: 1.3rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s; z-index: 3; }
+.sim-arrow:hover { background: var(--gold); transform: translateY(-50%) scale(1.05); }
+.sim-arrow.left  { left: -18px; }
+.sim-arrow.right { right: -18px; }
+
+/* ════════════════════════════════════════════════
+   FOOTER  (verbatim from index.html)
+════════════════════════════════════════════════ */
+
+#footer {
+  background: var(--red-dark);
+  padding: 0 ;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.ft-top-rule {
+  display: flex; align-items: center; gap: 10px;
+  padding: 32px 64px 0;
+}
+
+.ft-rule-line {
+  flex: 1; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(167,112,58,.5), transparent);
+}
+
+.ft-rule-diamond {
+  width: 8px; height: 8px;
+  background: var(--gold);
+  transform: rotate(45deg);
+  flex-shrink: 0;
+}
+
+.ft-inner {
+  max-width: 1280px; margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.8fr 1fr 1fr 1.3fr;
+  gap: 48px;
+  padding: 48px 64px 56px;
+}
+
+@media(max-width:900px) {
+  .ft-inner { grid-template-columns: 1fr 1fr; gap: 36px; padding: 40px 28px 48px; }
+  .ft-top-rule { padding: 28px 28px 0; }
+}
+
+@media(max-width:520px) {
+  .ft-inner { grid-template-columns: 1fr; padding: 32px 20px 40px; }
+  .ft-top-rule { padding: 24px 20px 0; }
+}
+
+.ft-logo {
+  display: flex; align-items: center; gap: 12px; margin-bottom: 18px;
+}
+
+.ft-logo-mark {
+  width: 40px; height: 40px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.35rem; font-weight: 600; color: white;
+}
+
+.ft-logo-text { display: flex; flex-direction: column; line-height: 1; }
+.ft-logo-name { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; font-weight: 500; color: var(--cream); letter-spacing: .04em; }
+.ft-logo-sub  { font-size: .68rem; font-weight: 400; letter-spacing: .12em; text-transform: uppercase; color: var(--gold-light); margin-top: 3px; }
+
+.ft-brand-desc { font-size: .84rem; line-height: 1.72; color: rgba(247,242,234,.5); max-width: 280px; margin-bottom: 24px; }
+
+.ft-social-label { font-size: .7rem; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: rgba(247,242,234,.4); margin-bottom: 12px; }
+
+.ft-socials { display: flex; gap: 10px; margin-bottom: 12px; }
+
+.ft-social {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(167,112,58,.12);
+  border: 1px solid rgba(167,112,58,.3);
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(247,242,234,.6); text-decoration: none;
+  transition: all .2s;
+}
+
+.ft-social svg { width: 16px; height: 16px; }
+.ft-social:hover { background: var(--gold); color: white; border-color: var(--gold); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(167,112,58,.35); }
+
+.ft-handle { font-size: .78rem; color: rgba(247,242,234,.35); }
+
+.ft-col-heading {
+  font-size: .72rem; font-weight: 600; letter-spacing: .1em;
+  text-transform: uppercase; color: rgba(247,242,234,.7);
+  margin-bottom: 20px;
+}
+
+.ft-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+
+.ft-list li a {
+  font-size: .86rem; color: rgba(247,242,234,.5);
+  text-decoration: none; transition: color .2s, padding-left .2s;
+}
+
+.ft-list li a:hover { color: var(--gold); padding-left: 4px; }
+
+/* Contact column */
+.ft-contact-row {
+  display: flex; flex-direction: column; gap: 2px;
+  margin-bottom: 18px; text-decoration: none; color: inherit;
+  transition: opacity .2s;
+}
+
+.ft-contact-row:hover { opacity: .8; }
+
+.ft-contact-label { font-size: .7rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--gold-light); opacity: .8; }
+.ft-contact-val { font-size: .86rem; color: rgba(247,242,234,.65); line-height: 1.5; }
+
+.ft-cta {
+  display: inline-flex; align-items: center; gap: 10px;
+  margin-top: 8px;
+  background: var(--gold); color: white;
+  font-size: .83rem; font-weight: 500; letter-spacing: .03em;
+  text-decoration: none; padding: 10px 22px; border-radius: 99px;
+  transition: all .2s;
+}
+
+.ft-cta svg { width: 18px; height: 9px; }
+.ft-cta:hover { background: var(--gold-light); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(167,112,58,.4); }
+
+/* Bottom bar */
+.ft-bottom-rule { height: 1px; background: rgba(255,255,255,.07); margin: 0 64px; }
+
+@media(max-width:900px) { .ft-bottom-rule { margin: 0 28px; } }
+@media(max-width:520px)  { .ft-bottom-rule { margin: 0 20px; } }
+
+.ft-bottom {
+  max-width: 1280px; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+  padding: 22px 64px 28px;
+}
+
+@media(max-width:900px) { .ft-bottom { padding: 18px 28px 24px; } }
+@media(max-width:520px)  { .ft-bottom { padding: 16px 20px 22px; flex-direction: column; align-items: flex-start; gap: 8px; } }
+
+.ft-copy { font-size: .78rem; color: rgba(247,242,234,.3); }
+
+.ft-bottom-links { display: flex; gap: 20px; }
+
+.ft-bottom-links a {
+  font-size: .78rem; color: rgba(247,242,234,.3);
+  text-decoration: none; transition: color .2s;
+}
+
+.ft-bottom-links a:hover { color: rgba(247,242,234,.65); }
+
+.ft-bottom-sep { color: rgba(247,242,234,.2); }
+
+/* ─── LIGHTBOX ───────────────────────────────────── */
+
+.lightbox { position: fixed; inset: 0; background: rgba(0,0,0,.96); z-index: 9999; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(8px); }
+.lightbox.open { display: flex; }
+
+.lb-close { position: fixed; top: 18px; right: 22px; background: rgba(85,21,22,.8); border: 1px solid var(--gold); color: white; width: 42px; height: 42px; border-radius: 50%; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s; z-index: 10001; }
+.lb-close:hover { background: var(--gold); transform: scale(1.05); }
+
+.lb-stage { position: relative; display: flex; align-items: center; max-width: min(960px, 95vw); width: 100%; }
+
+.lb-img { max-width: 100%; max-height: 72vh; object-fit: contain; border-radius: 10px; display: block; margin: 0 auto; transition: opacity .18s ease; }
+
+.lb-arrow { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(85,21,22,.85); border: 1px solid var(--gold); color: white; width: 46px; height: 46px; border-radius: 50%; font-size: 1.4rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .2s; flex-shrink: 0; z-index: 2; }
+.lb-arrow:hover { background: var(--gold); transform: translateY(-50%) scale(1.05); }
+.lb-arrow.left  { left: -60px; }
+.lb-arrow.right { right: -60px; }
+
+@media(max-width:740px) { .lb-arrow.left { left: 4px; } .lb-arrow.right { right: 4px; } }
+
+.lb-thumbs { display: flex; gap: 8px; margin-top: 16px; overflow-x: auto; max-width: min(960px,95vw); padding-bottom: 4px; scrollbar-width: thin; scrollbar-color: var(--gold) transparent; }
+.lb-thumb { width: 64px; height: 46px; object-fit: cover; border-radius: 6px; cursor: pointer; flex-shrink: 0; opacity: .45; border: 2px solid transparent; transition: all .2s; }
+.lb-thumb:hover { opacity: .8; transform: scale(1.06); }
+.lb-thumb.active { opacity: 1; border-color: var(--gold); }
+.lb-count { color: rgba(255,255,255,.5); font-size: .82rem; margin-top: 10px; }
+
+/* ─── FAB ────────────────────────────────────────── */
+
+.fab { position: fixed; bottom: 28px; right: 28px; width: 46px; height: 46px; background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%); border: none; border-radius: 50%; color: white; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 18px rgba(167,112,58,.5); opacity: 0; pointer-events: none; transition: all .3s; z-index: 900; }
+.fab.show { opacity: 1; pointer-events: all; }
+.fab:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 24px rgba(167,112,58,.6); }
 
 </style>
-
 </head>
-
 <body>
 
-<section class="exp-hero">
+<!-- ════════════════════════════════════════════════
+     NAVBAR  (from index.html)
+════════════════════════════════════════════════ -->
+<nav id="navbar">
+  <div class="nav-logo">
+    <img src="images/Crislynn-logo.png" alt="Crislynn Ventures Logo"
+         onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+    <a href="index.html" class="nav-logo-fallback">Crislynn Ventures</a>
+  </div>
+  <ul class="nav-links">
+    <li><a href="index.html#home">Home</a></li>
+    <li><a href="index.html#experiences">Experiences</a></li>
+    <li><a href="index.html#services">Services</a></li>
+    <li><a href="index.html#about">Why Crislynn</a></li>
+    <li><a href="index.html#stories">Stories</a></li>
+    <li><a href="index.html#contact">Contact</a></li>
+    <li><a href="index.html#contact" class="nav-cta">Design Your Journey</a></li>
+  </ul>
+  <div class="nav-burger" id="navBurger">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
 
-<video id="heroVideo" autoplay muted loop playsinline></video>
-
-<img id="heroImage" />
-
-<div class="exp-hero-inner">
-<h1 id="expTitle"></h1>
-<p id="expDesc"></p>
+<!-- Mobile nav dropdown -->
+<div class="nav-mobile" id="navMobile">
+  <a href="index.html#home">Home</a>
+  <a href="index.html#experiences">Experiences</a>
+  <a href="index.html#services">Services</a>
+  <a href="index.html#about">Why Crislynn</a>
+  <a href="index.html#stories">Stories</a>
+  <a href="index.html#contact">Contact</a>
+  <a href="index.html#contact" class="nav-cta-mobile">Design Your Journey</a>
 </div>
 
+
+<!-- ════════════════════════════════════════════════
+     HERO  — populated dynamically from URL params
+     
+     HOW TO USE FROM index.html cards:
+     Change each card's <a href="..."> to include params:
+
+     href="WatamuMarineExplorer.html
+           ?title=Watamu%20Marine%20Explorer
+           &desc=Coral%20gardens%20and%20turquoise%20waters...
+           &media=images/Watamu.jpeg
+           &type=image
+           &tag=Full%20Day"
+
+     For video cards use type=video:
+     href="dhowsCruiseExp.html
+           ?title=Dhow%20Cruise%20Experience
+           &desc=Sail%20the%20Indian%20Ocean...
+           &media=https%3A%2F%2Fwww.pexels.com%2Fdownload%2Fvideo%2F11025496%2F
+           &type=video
+           &tag=Full%20Day"
+════════════════════════════════════════════════ -->
+<section class="exp-hero" id="expHero">
+  <!-- Fallback background shown until media loads -->
+  <div class="hero-fallback-bg"></div>
+
+  <!-- Video background (shown when type=video) -->
+  <video class="hero-video" id="heroVideo" autoplay muted loop playsinline></video>
+
+  <!-- Image background (shown when type=image) -->
+  <img class="hero-img" id="heroImage" alt="" src="">
+
+  <div class="exp-hero-inner">
+    <span class="exp-hero-tag" id="heroTag"></span>
+    <h1 id="heroTitle">Experience</h1>
+    <p id="heroDesc">Discover Kenya's most extraordinary destinations.</p>
+  </div>
 </section>
 
 
-<script>
+<!-- ════════════════════════════════════════════════
+     PAGE BODY — edit everything below freely
+     The hero above is the only auto-populated part
+════════════════════════════════════════════════ -->
 
-const data = JSON.parse(localStorage.getItem("selectedExperience"));
+<div class="page-wrap">
 
-const hero = document.querySelector(".exp-hero");
-const video = document.getElementById("heroVideo");
-const image = document.getElementById("heroImage");
+  <!-- ① GALLERY — full bleed -->
+  <div class="gallery-wrap" id="galleryWrap">
+    <div class="gallery-grid">
+      <div class="g-cell main" data-idx="0">
+        <img src="https://images.unsplash.com/photo-1516426122078-c23e76319801?w=900&q=80" alt="Safari sunset">
+      </div>
+      <div class="g-cell" data-idx="1">
+        <img src="https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=600&q=80" alt="Acacia at sunset">
+      </div>
+      <div class="g-cell more-cell" data-idx="2">
+        <img src="https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=600&q=80" alt="Landscape">
+        <div class="g-more-label">+12 more</div>
+      </div>
+    </div>
+    <button class="gallery-view-btn" id="viewAllBtn">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="7" height="7" rx="1"/>
+        <rect x="14" y="3" width="7" height="7" rx="1"/>
+        <rect x="3" y="14" width="7" height="7" rx="1"/>
+        <rect x="14" y="14" width="7" height="7" rx="1"/>
+      </svg>
+      View All Photos
+    </button>
+  </div>
 
-if(data){
 
-document.getElementById("expTitle").innerText = data.title;
-document.getElementById("expDesc").innerText = data.desc;
+<!-- ② OVERVIEW -->
+<div class="panel">
+  <div class="sec-head">
+    <h2>Overview</h2>
+    <div class="sec-rule"><span class="bar"></span><span class="dot"></span></div>
+  </div>
+  <div class="overview-body">
+    <p>
+      <strong id="overviewTitle">Bush to Beach Safari</strong>
+      <span id="overviewBody"> — Journey from the iconic Maasai Mara savannah to the serene beaches of Malindi. Seven days of wildlife, culture, and coastal relaxation.</span>
+    </p>
+    <ul class="ov-list">
+      <li>Seven-day, six-night safari combining Maasai Mara and Malindi</li>
+      <li>Guided game drives, cultural visits, and optional balloon safari</li>
+      <li>Transfers by road or flight between Nairobi, Maasai Mara, and Malindi</li>
+      <li>Beach leisure and coastal resort stays</li>
+      <li>Professional guides, meals, and accommodation included</li>
+      <li>Perfect mix of wildlife, culture, and relaxation</li>
+    </ul>
+  </div>
+</div>
 
-/* ✅ improved safe video check */
+<!-- ③ WHAT YOU'LL EXPERIENCE -->
+<div class="panel">
+  <div class="sec-head">
+    <h2>What You'll Experience</h2>
+    <div class="sec-rule"><span class="bar"></span><span class="dot"></span></div>
+  </div>
+  <div class="exp-grid">
+    <div class="exp-tile">
+      <div class="exp-tile-icon ic-gold">🦓</div>
+      <h3>Maasai Mara Wildlife</h3>
+      <p>Morning and afternoon game drives in Kenya’s most iconic reserve</p>
+    </div>
+    <div class="exp-tile">
+      <div class="exp-tile-icon ic-cream">🎈</div>
+      <h3>Balloon Safari</h3>
+      <p>Optional hot air balloon ride over the Mara plains</p>
+    </div>
+    <div class="exp-tile">
+      <div class="exp-tile-icon ic-red">🏖️</div>
+      <h3>Beach Leisure</h3>
+      <p>Relax at Malindi beach resorts after savannah adventures</p>
+    </div>
+    <div class="exp-tile">
+      <div class="exp-tile-icon ic-gold">🏕️</div>
+      <h3>Lodges & Camps</h3>
+      <p>Comfortable overnight stays in savannah lodges and beach resorts</p>
+    </div>
+    <div class="exp-tile">
+      <div class="exp-tile-icon ic-cream">🚐</div>
+      <h3>Transfers</h3>
+      <p>Professional guided transfers between locations by road or flight</p>
+    </div>
+    <div class="exp-tile">
+      <div class="exp-tile-icon ic-red">📸</div>
+      <h3>Photography</h3>
+      <p>Capture wildlife, culture, and coastal landscapes</p>
+    </div>
+  </div>
+</div>
 
-if(data.video && data.video !== "null" && data.video !== ""){
+<!-- ④ SAMPLE ITINERARY -->
+<div class="panel-dark">
+  <div class="sec-head">
+    <h2>Sample Itinerary</h2>
+    <div class="sec-rule"><span class="bar"></span><span class="dot"></span></div>
+  </div>
+  <div class="itin-list">
 
-video.innerHTML = `<source src="${data.video}" type="video/mp4">`;
-video.load();
+    <!-- Day 1 -->
+    <div class="itin-row">
+      <div class="itin-badge-col"><span class="itin-badge">Day 1</span></div>
+      <div class="itin-body">
+        <h3>Arrival in Nairobi & Transfer</h3>
+        <p>Arrive in Nairobi, meet & greet, transfer to hotel, overnight stay.</p>
+        <div class="itin-tags">
+          <span class="itin-tag">Arrival</span>
+          <span class="itin-tag">Transfer</span>
+          <span class="itin-tag">Hotel</span>
+        </div>
+      </div>
+    </div>
 
-video.style.display = "block";
-video.style.opacity = "1";
+    <!-- Day 2 -->
+    <div class="itin-row">
+      <div class="itin-badge-col"><span class="itin-badge">Day 2</span></div>
+      <div class="itin-body">
+        <h3>Transfer to Maasai Mara & Afternoon Game Drive</h3>
+        <p>Drive or fly to Maasai Mara, lunch, and enjoy an afternoon game drive. Overnight at lodge/camp.</p>
+        <div class="itin-tags">
+          <span class="itin-tag">Transfer</span>
+          <span class="itin-tag">Game Drive</span>
+          <span class="itin-tag">Overnight</span>
+        </div>
+      </div>
+    </div>
 
-image.style.display = "none";
-image.style.opacity = "0";
+    <!-- Day 3 -->
+    <div class="itin-row">
+      <div class="itin-badge-col"><span class="itin-badge">Day 3</span></div>
+      <div class="itin-body">
+        <h3>Full Day Game Drives in Maasai Mara</h3>
+        <p>Morning and afternoon game drives to see lions, elephants, giraffes, and more. Overnight at lodge/camp.</p>
+        <div class="itin-tags">
+          <span class="itin-tag">Game Drive</span>
+          <span class="itin-tag">Wildlife</span>
+          <span class="itin-tag">Overnight</span>
+        </div>
+      </div>
+    </div>
 
-}else if(data.image){
+    <!-- Day 4 -->
+    <div class="itin-row">
+      <div class="itin-badge-col"><span class="itin-badge">Day 4</span></div>
+      <div class="itin-body">
+        <h3>Optional Balloon Safari & Cultural Visit</h3>
+        <p>Optional hot air balloon safari at sunrise or cultural visit, followed by afternoon game drive. Overnight at lodge/camp.</p>
+        <div class="itin-tags">
+          <span class="itin-tag">Balloon Safari</span>
+          <span class="itin-tag">Culture</span>
+          <span class="itin-tag">Game Drive</span>
+        </div>
+      </div>
+    </div>
 
-image.src = data.image;
+    <!-- Day 5 -->
+    <div class="itin-row">
+      <div class="itin-badge-col"><span class="itin-badge">Day 5</span></div>
+      <div class="itin-body">
+        <h3>Morning Game Drive & Return to Nairobi</h3>
+        <p>Morning game drive, then return to Nairobi for day room or airport transfer.</p>
+        <div class="itin-tags">
+          <span class="itin-tag">Game Drive</span>
+          <span class="itin-tag">Transfer</span>
+          <span class="itin-tag">Nairobi</span>
+        </div>
+      </div>
+    </div>
 
-image.style.display = "block";
-image.style.opacity = "1";
+    <!-- Day 6 -->
+    <div class="itin-row">
+      <div class="itin-badge-col"><span class="itin-badge">Day 6</span></div>
+      <div class="itin-body">
+        <h3>Flight to Malindi & Beach Resort Transfer</h3>
+        <p>Fly to Malindi, transfer to beach resort, overnight stay.</p>
+        <div class="itin-tags">
+          <span class="itin-tag">Flight</span>
+          <span class="itin-tag">Transfer</span>
+          <span class="itin-tag">Beach Resort</span>
+        </div>
+      </div>
+    </div>
 
-video.style.display = "none";
-video.style.opacity = "0";
+    <!-- Day 7 -->
+    <div class="itin-row">
+      <div class="itin-badge-col"><span class="itin-badge">Day 7</span></div>
+      <div class="itin-body">
+        <h3>Beach Leisure & Departure</h3>
+        <p>Enjoy a relaxed beach day before transfer to airport or start optional extension.</p>
+        <div class="itin-tags">
+          <span class="itin-tag">Beach</span>
+          <span class="itin-tag">Relaxation</span>
+          <span class="itin-tag">Departure</span>
+        </div>
+      </div>
+    </div>
 
+  </div>
+</div>
+
+<!-- ⑤ LOCATION -->
+<div class="panel">
+  <div class="sec-head">
+    <h2>Location</h2>
+    <div class="sec-rule"><span class="bar"></span><span class="dot"></span></div>
+  </div>
+  <p class="loc-meta">Maasai Mara & Malindi Coastline, Kenya. Duration: 7 Days | 6 Nights. Departure from Nairobi.</p>
+  <iframe class="map-frame" loading="lazy"
+    src="https://www.google.com/maps?q=Maasai+Mara+National+Reserve+Kenya&output=embed">
+  </iframe>
+</div>  
+
+
+  <!-- ⑥ REVIEWS -->
+  <div class="panel">
+    <div class="sec-head">
+      <h2>Traveller Reviews</h2>
+      <div class="sec-rule"><span class="bar"></span><span class="dot"></span></div>
+    </div>
+    <div class="reviews-summary">
+      <span class="score-big">4.9</span>
+      <div class="score-right">
+        <div class="stars">★★★★★</div>
+        <span>Based on 284 verified reviews</span>
+      </div>
+    </div>
+    <div class="reviews-grid">
+
+      <div class="rv-card">
+        <div class="rv-top">
+          <div class="rv-avatar">🧑🏽</div>
+          <div>
+            <div class="rv-name">James Waweru</div>
+            <div class="rv-loc">Nairobi, Kenya</div>
+          </div>
+        </div>
+        <div class="rv-stars">★★★★★</div>
+        <p class="rv-text">Absolutely breathtaking. Witnessed two river crossings on the same day — something I'll never forget. The guides were incredibly knowledgeable and the tented camp was pure luxury.</p>
+        <span class="rv-date">February 2025</span>
+      </div>
+
+      <div class="rv-card">
+        <div class="rv-top">
+          <div class="rv-avatar">👩🏼</div>
+          <div>
+            <div class="rv-name">Sophie Laurent</div>
+            <div class="rv-loc">Lyon, France</div>
+          </div>
+        </div>
+        <div class="rv-stars">★★★★★</div>
+        <p class="rv-text">The balloon safari at sunrise was worth every cent. Floating over thousands of wildebeest with the first golden light — there are no words. Book this trip.</p>
+        <span class="rv-date">October 2024</span>
+      </div>
+
+      <div class="rv-card">
+        <div class="rv-top">
+          <div class="rv-avatar">👨🏾</div>
+          <div>
+            <div class="rv-name">David Okonkwo</div>
+            <div class="rv-loc">Lagos, Nigeria</div>
+          </div>
+        </div>
+        <div class="rv-stars">★★★★☆</div>
+        <p class="rv-text">A proper African safari experience. We saw all Big Five within the first two days. The Maasai village visit was very authentic and educational.</p>
+        <span class="rv-date">August 2024</span>
+      </div>
+
+      <div class="rv-card">
+        <div class="rv-top">
+          <div class="rv-avatar">👩🏻</div>
+          <div>
+            <div class="rv-name">Yuki Tanaka</div>
+            <div class="rv-loc">Tokyo, Japan</div>
+          </div>
+        </div>
+        <div class="rv-stars">★★★★★</div>
+        <p class="rv-text">As a wildlife photographer this place is paradise. The early morning light on the plains is magical. Our guide knew exactly where to be at the perfect moment.</p>
+        <span class="rv-date">July 2024</span>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ⑦ SIMILAR DESTINATIONS -->
+  <div class="similar-section">
+    <div class="similar-inner">
+
+      <div class="sec-head">
+        <h2>Similar Destinations</h2>
+        <div class="sec-rule"><span class="bar"></span><span class="dot"></span></div>
+      </div>
+
+      <!-- COAST & ISLANDS -->
+      <div class="sim-cat-row">
+        <span class="sim-cat-eyebrow">01</span>
+        <h3 class="sim-cat-title">Coast &amp; Islands</h3>
+        <div class="sim-cat-line"></div>
+      </div>
+      <div class="sim-slider-wrap">
+        <button class="sim-arrow left" onclick="slideSimExp(this,-1)">‹</button>
+        <div class="sim-cards-track">
+          <a class="sim-card" href="WatamuMarineExplorer.html?title=Watamu%20Marine%20Explorer&desc=Coral%20gardens%20and%20turquoise%20waters%20teeming%20with%20life%20beneath%20the%20Indian%20Ocean%27s%20surface.&media=images/Watamu.jpeg&type=image&tag=Full%20Day">
+            <div class="sim-card-media"><img src="images/Watamu.jpeg" alt="Watamu" onerror="this.src='https://images.unsplash.com/photo-1559494007-9f5847c49d94?w=600&q=80'"></div>
+            <div class="sim-card-body">
+              <div class="sim-card-tag">Full Day</div>
+              <h4>Watamu Marine Explorer</h4>
+              <p>Coral gardens and turquoise waters.</p>
+              <span class="sim-card-link">Explore Experience ›</span>
+            </div>
+          </a>
+          <a class="sim-card" href="dhowsCruiseExp.html?title=Dhow%20Cruise%20Experience&desc=Sail%20the%20Indian%20Ocean%20the%20timeless%20Swahili%20way%20—%20sun%2C%20wind%2C%20and%20the%20open%20horizon.&media=https%3A%2F%2Fwww.pexels.com%2Fdownload%2Fvideo%2F11025496%2F&type=video&tag=Full%20Day">
+            <div class="sim-card-media"><video autoplay muted loop playsinline><source src="https://www.pexels.com/download/video/11025496/" type="video/mp4"></video></div>
+            <div class="sim-card-body">
+              <div class="sim-card-tag">Full Day</div>
+              <h4>Dhow Cruise Experience</h4>
+              <p>Sail the Indian Ocean the timeless Swahili way.</p>
+              <span class="sim-card-link">Explore Experience ›</span>
+            </div>
+          </a>
+          <a class="sim-card" href="IslandEscapades.html?title=Island%20Escapades&desc=Secluded%20shores%20and%20island%20time%20at%20its%20finest%20—%20hidden%20beaches%20and%20swaying%20palms.&media=https%3A%2F%2Fwww.pexels.com%2Fdownload%2Fvideo%2F17968553%2F&type=video&tag=Full%20Day">
+            <div class="sim-card-media"><video autoplay muted loop playsinline><source src="https://www.pexels.com/download/video/17968553/" type="video/mp4"></video></div>
+            <div class="sim-card-body">
+              <div class="sim-card-tag">Full Day</div>
+              <h4>Island Escapades</h4>
+              <p>Secluded shores and island time at its finest.</p>
+              <span class="sim-card-link">Explore Experience ›</span>
+            </div>
+          </a>
+          <a class="sim-card" href="goldenSandsAndMarafaAdventure.html?title=Golden%20Sands%20%26%20Marafa%20Dunes&desc=Sculpted%20canyons%2C%20golden%20dunes%2C%20and%20island%20calm%20—%20one%20unforgettable%20coastal%20journey.&media=images/Marafa.jpeg&type=image&tag=Full%20Day">
+            <div class="sim-card-media"><img src="images/Marafa.jpeg" alt="Marafa" onerror="this.src='https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=600&q=80'"></div>
+            <div class="sim-card-body">
+              <div class="sim-card-tag">Full Day</div>
+              <h4>Golden Sands &amp; Marafa Dunes</h4>
+              <p>Sculpted canyons, golden dunes, and island calm.</p>
+              <span class="sim-card-link">Explore Experience ›</span>
+            </div>
+          </a>
+        </div>
+        <button class="sim-arrow right" onclick="slideSimExp(this,1)">›</button>
+      </div>
+
+      <!-- CULTURE & HERITAGE -->
+      <div class="sim-cat-row">
+        <span class="sim-cat-eyebrow">02</span>
+        <h3 class="sim-cat-title">Culture &amp; Heritage</h3>
+        <div class="sim-cat-line"></div>
+      </div>
+      <div class="sim-slider-wrap">
+        <button class="sim-arrow left" onclick="slideSimExp(this,-1)">‹</button>
+        <div class="sim-cards-track">
+          <a class="sim-card" href="swahilibites.html?title=Swahili%20Bites%20%26%20Henna%20Delight&desc=Taste%2C%20create%20and%20connect%20with%20the%20vibrant%20spirit%20of%20the%20Swahili%20coast%20through%20food%20and%20art.&media=images/Swahilifood.jpeg&type=image&tag=Full%20Day">
+            <div class="sim-card-media"><img src="images/Swahilifood.jpeg" alt="Swahili Bites" onerror="this.src='https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=80'"></div>
+            <div class="sim-card-body">
+              <div class="sim-card-tag">Full Day</div>
+              <h4>Swahili Bites &amp; Henna Delight</h4>
+              <p>Taste, create and connect with the vibrant spirit of the Swahili coast.</p>
+              <span class="sim-card-link">Explore Experience ›</span>
+            </div>
+          </a>
+          <a class="sim-card" href="Malindiheritage.html?title=Malindi%20Heritage%20%26%20Falconry%20Circuit&desc=Step%20into%20centuries%20of%20history%20while%20experiencing%20the%20living%20coastal%20traditions%20of%20Malindi.&media=videos/MalindiCulture.mp4&type=video&tag=Full%20Day">
+            <div class="sim-card-media"><video autoplay muted loop playsinline><source src="videos/MalindiCulture.mp4" type="video/mp4"></video></div>
+            <div class="sim-card-body">
+              <div class="sim-card-tag">Full Day</div>
+              <h4>Malindi Heritage &amp; Falconry Circuit</h4>
+              <p>Step into centuries of history while experiencing living coastal traditions.</p>
+              <span class="sim-card-link">Explore Experience ›</span>
+            </div>
+          </a>
+          <a class="sim-card" href="CraftCultureCanyon.html?title=Craft%2C%20Culture%20%26%20Canyon%20Tour&desc=Artistry%2C%20heritage%20and%20nature%20woven%20into%20one%20enriching%20day%20of%20deep%20coastal%20discovery.&media=https%3A%2F%2Fwww.pexels.com%2Fdownload%2Fvideo%2F3967167%2F&type=video&tag=Full%20Day">
+            <div class="sim-card-media"><video autoplay muted loop playsinline><source src="https://www.pexels.com/download/video/3967167/" type="video/mp4"></video></div>
+            <div class="sim-card-body">
+              <div class="sim-card-tag">Full Day</div>
+              <h4>Craft, Culture &amp; Canyon Tour</h4>
+              <p>Artistry, heritage and nature woven into one enriching day.</p>
+              <span class="sim-card-link">Explore Experience ›</span>
+            </div>
+          </a>
+          <a class="sim-card" href="ancientStones.html?title=Ancient%20Stones%20to%20Mangrove%20Forest&desc=From%20ancient%20ruins%20to%20whispering%20mangroves%20—%20a%20journey%20through%20time%20and%20nature%20combined.&media=images/Ancientstones.jpeg&type=image&tag=Full%20Day">
+            <div class="sim-card-media"><img src="images/Ancientstones.jpeg" alt="Ancient Stones" onerror="this.src='https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=600&q=80'"></div>
+            <div class="sim-card-body">
+              <div class="sim-card-tag">Full Day</div>
+              <h4>Ancient Stones to Mangrove Forest</h4>
+              <p>From ancient ruins to whispering mangroves.</p>
+              <span class="sim-card-link">Explore Experience ›</span>
+            </div>
+          </a>
+        </div>
+        <button class="sim-arrow right" onclick="slideSimExp(this,1)">›</button>
+      </div>
+
+      <!-- SAFARIS -->
+      <div class="sim-cat-row">
+        <span class="sim-cat-eyebrow">03</span>
+        <h3 class="sim-cat-title">Safaris</h3>
+        <div class="sim-cat-line"></div>
+      </div>
+      <div class="sim-slider-wrap">
+        <button class="sim-arrow left" onclick="slideSimExp(this,-1)">‹</button>
+        <div class="sim-cards-track">
+          <a class="sim-card" href="TsavoEast.html?title=Tsavo%20East%20One-Day%20Safari&desc=A%20single%20day.%20Africa%27s%20wilderness.%20Endless%20possibility%20in%20Kenya%27s%20legendary%20red%20elephant%20country.&media=images/Tsavoeast.jpg&type=image&tag=Full%20Day">
+            <div class="sim-card-media"><img src="images/Tsavoeast.jpg" alt="Tsavo East" onerror="this.src='https://images.unsplash.com/photo-1516426122078-c23e76319801?w=600&q=80'"></div>
+            <div class="sim-card-body">
+              <div class="sim-card-tag">Full Day</div>
+              <h4>Tsavo East One-Day Safari</h4>
+              <p>A single day. Africa's wilderness. Endless possibility.</p>
+              <span class="sim-card-link">Explore Experience ›</span>
+            </div>
+          </a>
+          <a class="sim-card" href="tsavoAmboseli.html?title=Tsavo%20–%20Amboseli%20Safari&desc=Wild%20landscapes%20crowned%20by%20Kilimanjaro%20—%20the%20iconic%20journey%20between%20two%20legendary%20parks.&media=videos/Amboseli.mp4&type=video&tag=4%20days%20%C2%B7%203%20nights">
+            <div class="sim-card-media"><video autoplay muted loop playsinline><source src="videos/Amboseli.mp4" type="video/mp4"></video></div>
+            <div class="sim-card-body">
+              <div class="sim-card-tag">4 days · 3 nights</div>
+              <h4>Tsavo – Amboseli Safari</h4>
+              <p>Wild landscapes crowned by Kilimanjaro.</p>
+              <span class="sim-card-link">Explore Experience ›</span>
+            </div>
+          </a>
+          <a class="sim-card" href="bushToBeachSafiris.html?title=Bush%20to%20Beach%20—%20Mara%20%26%20Malindi&desc=From%20the%20drama%20of%20the%20savannah%20to%20the%20calm%20of%20the%20ocean%20—%20the%20ultimate%20Kenyan%20contrast.&media=videos/Maasaimara.mp4&type=video&tag=7%20days%20%C2%B7%206%20nights">
+            <div class="sim-card-media"><video autoplay muted loop playsinline><source src="videos/Maasaimara.mp4" type="video/mp4"></video></div>
+            <div class="sim-card-body">
+              <div class="sim-card-tag">7 days · 6 nights</div>
+              <h4>Bush to Beach — Mara &amp; Malindi</h4>
+              <p>From the drama of the savannah to the calm of the ocean.</p>
+              <span class="sim-card-link">Explore Experience ›</span>
+            </div>
+          </a>
+          <a class="sim-card" href="TsavoEastWest.html?title=Tsavo%20East%20%26%20West%20Safari&desc=Two%20legendary%20parks.%20One%20unforgettable%20safari%20across%20the%20vast%20heart%20of%20Kenya%27s%20wilderness.&media=images/TsavoEastandWest.jpg&type=image&tag=3%20days%20%C2%B7%202%20nights">
+            <div class="sim-card-media"><img src="images/TsavoEastandWest.jpg" alt="Tsavo East & West" onerror="this.src='https://images.unsplash.com/photo-1504173010664-32509107de5c?w=600&q=80'"></div>
+            <div class="sim-card-body">
+              <div class="sim-card-tag">3 days · 2 nights</div>
+              <h4>Tsavo East &amp; West Safari</h4>
+              <p>Two legendary parks. One unforgettable safari.</p>
+              <span class="sim-card-link">Explore Experience ›</span>
+            </div>
+          </a>
+        </div>
+        <button class="sim-arrow right" onclick="slideSimExp(this,1)">›</button>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- end page-wrap -->
+
+
+<!-- ════════════════════════════════════════════════
+     FOOTER  (from index.html)
+════════════════════════════════════════════════ -->
+<footer id="footer">
+
+  <div class="ft-top-rule">
+    <span class="ft-rule-line"></span>
+    <span class="ft-rule-diamond"></span>
+    <span class="ft-rule-line"></span>
+  </div>
+
+  <div class="ft-inner">
+
+    <!-- Brand column -->
+    <div class="ft-brand">
+      <div class="ft-logo">
+        <div class="ft-logo-mark">C</div>
+        <div class="ft-logo-text">
+          <span class="ft-logo-name">Crislynn</span>
+          <span class="ft-logo-sub">Ventures</span>
+        </div>
+      </div>
+      <p class="ft-brand-desc">Rooted in Malindi on the Kenyan Coast — crafting seamless, authentic journeys across Kenya and beyond since 2018.</p>
+
+      <div class="ft-social-label">Follow Our Journey</div>
+      <div class="ft-socials">
+        <a class="ft-social" href="https://www.instagram.com/Crislynnventure/" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="5"/>
+            <circle cx="12" cy="12" r="4"/>
+            <circle cx="17.5" cy="6.5" r="0.8" fill="currentColor" stroke="none"/>
+          </svg>
+        </a>
+        <a class="ft-social" href="https://www.facebook.com/profile.php?id=61584847081730" target="_blank" rel="noopener" aria-label="Facebook">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+          </svg>
+        </a>
+        <a class="ft-social" href="https://x.com/Crislynnventure" target="_blank" rel="noopener" aria-label="X (Twitter)">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+          </svg>
+        </a>
+        <a class="ft-social" href="https://www.tiktok.com/@crislynnventures" target="_blank" rel="noopener" aria-label="TikTok">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.76a4.85 4.85 0 0 1-1.01-.07z"/>
+          </svg>
+        </a>
+      </div>
+      <p class="ft-handle">@CrislynnVentures</p>
+    </div>
+
+    <!-- Experiences -->
+    <div class="ft-col">
+      <h4 class="ft-col-heading">Experiences</h4>
+      <ul class="ft-list">
+        <li><a href="index.html#experiences">Dhow Cruise</a></li>
+        <li><a href="index.html#experiences">Island Escapades</a></li>
+        <li><a href="index.html#experiences">Watamu Marine Explorer</a></li>
+        <li><a href="index.html#experiences">Tsavo Safari</a></li>
+        <li><a href="index.html#experiences">Bush to Beach</a></li>
+      </ul>
+    </div>
+
+    <!-- Company -->
+    <div class="ft-col">
+      <h4 class="ft-col-heading">Company</h4>
+      <ul class="ft-list">
+        <li><a href="index.html#about">Our Story</a></li>
+        <li><a href="index.html#about">Why Crislynn</a></li>
+        <li><a href="index.html#services">Our Services</a></li>
+        <li><a href="index.html#stories">Stories</a></li>
+        <li><a href="index.html#contact">Contact Us</a></li>
+      </ul>
+    </div>
+
+    <!-- Contact -->
+    <div class="ft-col">
+      <h4 class="ft-col-heading">Get In Touch</h4>
+      <a class="ft-contact-row" href="/cdn-cgi/l/email-protection#462d27342f24330625342f352a3f28283023283233342335682529682d23">
+        <span class="ft-contact-label">Email</span>
+        <span class="ft-contact-val"><span class="__cf_email__" data-cfemail="d9b2b8abb0bbac99baabb0aab5a0b7b7afbcb7adacabbcaaf7bab6f7b2bc">[email&#160;protected]</span></span>
+      </a>
+      <a class="ft-contact-row" href="https://wa.me/254794464898" target="_blank" rel="noopener">
+        <span class="ft-contact-label">WhatsApp</span>
+        <span class="ft-contact-val">+254 794 464 898</span>
+      </a>
+      <div class="ft-contact-row">
+        <span class="ft-contact-label">Address</span>
+        <span class="ft-contact-val">Apt 7, Kijani Suites<br>Lamu Road, Malindi, Kenya</span>
+      </div>
+      <a href="index.html#contact" class="ft-cta">
+        Plan Your Journey
+        <svg viewBox="0 0 20 10" fill="none">
+          <path d="M0 5h18M14 1l4 4-4 4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>
+
+  </div>
+
+  <div class="ft-bottom-rule"></div>
+
+  <div class="ft-bottom">
+    <p class="ft-copy">© 2026 Crislynn Ventures Ltd. All rights reserved.</p>
+    <div class="ft-bottom-links">
+      <a href="#">Privacy Policy</a>
+      <span class="ft-bottom-sep">·</span>
+      <a href="#">Terms &amp; Conditions</a>
+    </div>
+  </div>
+
+</footer>
+
+
+<!-- ─── LIGHTBOX ─────────────────────────────────── -->
+<div class="lightbox" id="lightbox">
+  <button class="lb-close" id="lbClose">✕</button>
+  <div class="lb-stage">
+    <button class="lb-arrow left" id="lbPrev">‹</button>
+    <img class="lb-img" id="lbImg" src="" alt="">
+    <button class="lb-arrow right" id="lbNext">›</button>
+  </div>
+  <div class="lb-thumbs" id="lbThumbs"></div>
+  <div class="lb-count" id="lbCount"></div>
+</div>
+
+<!-- FAB -->
+<button class="fab" id="fab" aria-label="Back to top">↑</button>
+
+
+<!-- ════════════════════════════════════════════════
+     SCRIPTS
+════════════════════════════════════════════════ -->
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+
+/* ══════════════════════════════════════════════════
+   1.  NAVBAR
+══════════════════════════════════════════════════ */
+
+const burger   = document.getElementById('navBurger');
+const mobileNav = document.getElementById('navMobile');
+const navbar   = document.getElementById('navbar');
+
+burger.addEventListener('click', () => {
+  const isOpen = mobileNav.classList.toggle('open');
+  burger.classList.toggle('open', isOpen);
+  document.body.style.overflow = isOpen ? 'hidden' : '';
+});
+
+// Close mobile nav when a link is tapped
+mobileNav.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => {
+    mobileNav.classList.remove('open');
+    burger.classList.remove('open');
+    document.body.style.overflow = '';
+  });
+});
+
+// Navbar scroll style
+window.addEventListener('scroll', () => {
+  navbar.classList.toggle('scrolled', window.scrollY > 60);
+});
+
+
+/* ══════════════════════════════════════════════════
+   2.  HERO — populated from URL query params
+   
+   Expected params (all URL-encoded):
+     title  — experience title
+     desc   — short description
+     media  — path/URL to image or video file
+     type   — "image" | "video"
+     tag    — badge text e.g. "Full Day"
+   
+   Falls back gracefully if params are missing.
+══════════════════════════════════════════════════ */
+
+(function populateHero() {
+
+  const params = new URLSearchParams(window.location.search);
+  const title  = params.get('title');
+  const desc   = params.get('desc');
+  const media  = params.get('media');
+  const type   = (params.get('type') || 'image').toLowerCase();
+  const tag    = params.get('tag');
+
+  /* ── Text ── */
+  if (title) {
+    document.getElementById('heroTitle').textContent = title;
+    document.title = title + ' — Crislynn Ventures';
+    const ot = document.getElementById('overviewTitle');
+    if (ot) ot.textContent = title;
+  }
+
+  if (desc) {
+    document.getElementById('heroDesc').textContent = desc;
+  }
+
+  /* ── Tag badge ── */
+  const tagEl = document.getElementById('heroTag');
+  if (tag) {
+    tagEl.textContent = tag;
+  } else {
+    tagEl.style.display = 'none';
+  }
+
+  /* ── Media ── */
+  if (!media) return;   // nothing to do — fallback gradient stays
+
+  const heroVideo = document.getElementById('heroVideo');
+  const heroImage = document.getElementById('heroImage');
+
+  if (type === 'video') {
+
+    /* Must use <source> child so autoplay triggers properly in all browsers */
+    heroVideo.innerHTML = '';           // clear any old sources
+    const src = document.createElement('source');
+    src.src  = media;
+    src.type = 'video/mp4';
+    heroVideo.appendChild(src);
+
+    heroVideo.muted    = true;
+    heroVideo.autoplay = true;
+    heroVideo.loop     = true;
+    heroVideo.setAttribute('playsinline', '');
+    heroVideo.load();
+
+    /* Show as soon as first frame is ready */
+    heroVideo.addEventListener('loadeddata', function onLoaded() {
+      heroVideo.classList.add('active');
+      heroVideo.removeEventListener('loadeddata', onLoaded);
+    });
+
+    /* Safety net: show after 1 s even if loadeddata is late */
+    setTimeout(() => heroVideo.classList.add('active'), 1000);
+
+  } else {
+
+    /* Image */
+    heroImage.src = media;
+    heroImage.alt = title || 'Experience';
+
+    heroImage.addEventListener('load', function onLoaded() {
+      heroImage.classList.add('active');
+      heroImage.removeEventListener('load', onLoaded);
+    });
+
+    /* Safety net in case image is already cached */
+    if (heroImage.complete && heroImage.naturalWidth > 0) {
+      heroImage.classList.add('active');
+    }
+
+    /* Safety net: show after 1 s anyway */
+    setTimeout(() => heroImage.classList.add('active'), 1000);
+  }
+
+})();
+
+
+/* ══════════════════════════════════════════════════
+   3.  GALLERY LIGHTBOX
+══════════════════════════════════════════════════ */
+
+const IMGS = [
+  { src:"https://images.unsplash.com/photo-1516426122078-c23e76319801?w=1200&q=85", alt:"Safari sunset" },
+  { src:"https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=1200&q=85", alt:"Acacia at sunset" },
+  { src:"https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=1200&q=85", alt:"Misty landscape" },
+  { src:"https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?w=1200&q=85", alt:"Elephants and Kilimanjaro" },
+  { src:"https://images.unsplash.com/photo-1504173010664-32509107de5c?w=1200&q=85", alt:"Serengeti plains" },
+  { src:"https://images.unsplash.com/photo-1564760290292-23341e4df6ec?w=1200&q=85", alt:"Samburu reserve" },
+  { src:"https://images.unsplash.com/photo-1534177616072-ef7dc120449d?w=1200&q=85", alt:"Lion on savanna" },
+  { src:"https://images.unsplash.com/photo-1612428977562-6ae16d9ef9e2?w=1200&q=85", alt:"Giraffe at golden hour" },
+  { src:"https://images.unsplash.com/photo-1549366021-9f761d450615?w=1200&q=85", alt:"Hot air balloon" },
+  { src:"https://images.unsplash.com/photo-1523805009345-7448845a9e53?w=1200&q=85", alt:"Maasai warrior" },
+  { src:"https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=1200&q=85", alt:"Wildebeest migration" },
+  { src:"https://images.unsplash.com/photo-1452378174528-3090a4bba7b2?w=1200&q=85", alt:"Leopard on tree" },
+  { src:"https://images.unsplash.com/photo-1551190822-a9333d879b1f?w=1200&q=85", alt:"Cheetah on plains" },
+  { src:"https://images.unsplash.com/photo-1583416750470-965b2707b355?w=1200&q=85", alt:"Buffalo herd" },
+  { src:"https://images.unsplash.com/photo-1559494007-9f5847c49d94?w=1200&q=85", alt:"Ocean sunset" },
+];
+
+const lb       = document.getElementById('lightbox');
+const lbImg    = document.getElementById('lbImg');
+const lbThumbs = document.getElementById('lbThumbs');
+const lbCount  = document.getElementById('lbCount');
+let cur  = 0;
+let busy = false;
+
+function buildThumbs() {
+  lbThumbs.innerHTML = '';
+  IMGS.forEach((img, i) => {
+    const t = document.createElement('img');
+    t.className = 'lb-thumb' + (i === cur ? ' active' : '');
+    t.src = img.src.replace('w=1200','w=130');
+    t.alt = img.alt;
+    t.addEventListener('click', () => goTo(i));
+    lbThumbs.appendChild(t);
+  });
 }
 
-}else{
-
-document.getElementById("expTitle").innerText = "Experience";
-document.getElementById("expDesc").innerText = "Details coming soon.";
-
+function updateThumbState() {
+  document.querySelectorAll('.lb-thumb').forEach((t,j) => t.classList.toggle('active', j === cur));
+  const active = lbThumbs.querySelectorAll('.lb-thumb')[cur];
+  if (active) active.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
 }
+
+function goTo(i) {
+  if (busy) return;
+  busy = true;
+  cur  = (i + IMGS.length) % IMGS.length;
+  lbImg.style.opacity = '0';
+  lbCount.textContent = (cur + 1) + ' / ' + IMGS.length;
+  updateThumbState();
+  const next    = new Image();
+  next.onload   = () => { lbImg.src = IMGS[cur].src; lbImg.alt = IMGS[cur].alt; lbImg.style.opacity = '1'; busy = false; };
+  next.onerror  = () => { lbImg.src = IMGS[cur].src; lbImg.style.opacity = '1'; busy = false; };
+  next.src = IMGS[cur].src;
+}
+
+function openLb(i) {
+  cur = (i + IMGS.length) % IMGS.length;
+  lb.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  buildThumbs();
+  lbImg.src           = IMGS[cur].src;
+  lbImg.alt           = IMGS[cur].alt;
+  lbImg.style.opacity = '1';
+  lbCount.textContent = (cur + 1) + ' / ' + IMGS.length;
+}
+
+function closeLb() {
+  lb.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('lbClose').addEventListener('click', closeLb);
+document.getElementById('lbPrev').addEventListener('click', () => goTo(cur - 1));
+document.getElementById('lbNext').addEventListener('click', () => goTo(cur + 1));
+lb.addEventListener('click', e => { if (e.target === lb) closeLb(); });
+
+document.addEventListener('keydown', e => {
+  if (!lb.classList.contains('open')) return;
+  if (e.key === 'ArrowRight') goTo(cur + 1);
+  if (e.key === 'ArrowLeft')  goTo(cur - 1);
+  if (e.key === 'Escape')     closeLb();
+});
+
+document.querySelectorAll('.g-cell').forEach(cell => {
+  cell.addEventListener('click', () => openLb(parseInt(cell.dataset.idx) || 0));
+});
+
+document.getElementById('viewAllBtn').addEventListener('click', () => openLb(0));
+
+
+/* 4.  SIMILAR DESTINATIONS SLIDER */
+function slideSimExp(btn, dir) {
+  const track = btn.closest('.sim-slider-wrap').querySelector('.sim-cards-track');
+  const card  = track.querySelector('.sim-card');
+  if (!card) return;
+  const step = card.offsetWidth + 16;
+  track.scrollBy({ left: dir * step, behavior:'smooth' });
+}
+
+
+/* 5.  FAB */
+const fab = document.getElementById("fab");
+window.addEventListener("scroll", () => fab.classList.toggle("show", scrollY > 400));
+fab.addEventListener("click", () => window.scrollTo({ top:0, behavior:"smooth" }));
 
 </script>
-
 </body>
-
 </html>
