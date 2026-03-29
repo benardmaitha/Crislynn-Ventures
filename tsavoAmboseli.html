@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tsavo East One-Day Safari</title>
+<title>Tsavo - Amboseli Safari</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -215,7 +215,7 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
 #heroVideo {
   position: absolute; top: 0; left: 0;
   width: 100%; height: 100%;
-  object-fit: fill; z-index: 0;
+  object-fit: cover; z-index: 0;
   display: none;
   opacity: 0;
   transition: opacity .6s ease;
@@ -229,7 +229,7 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
 #heroImage {
   position: absolute; top: 0; left: 0;
   width: 100%; height: 100%;
-  object-fit: fill; z-index: 0;
+  object-fit: cover; z-index: 0;
   display: none;
   opacity: 0;
   transition: opacity .6s ease;
@@ -366,68 +366,409 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
 
 @media(max-width:600px) { .panel-dark { padding: 26px 18px; margin: 20px 0 0; } }
 
-/* ─── GALLERY ───────────────────────────────────── */
+/* ═══════════════════════════════════════════════
+   GALLERY + LIGHTBOX — complete css
+   ═══════════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,300&family=Montserrat:wght@200;300;400&display=swap');
 
-.gallery-wrap { position: relative; margin-top: 28px; }
+/* GALLERY WRAP — transparent, no container box */
+.gallery-wrap {
+  background: transparent;
+  padding: 0;
+  border-radius: 0;
+  margin-top: 2px;
+  overflow: visible;
+  position: relative;
+}
 
-.gallery-grid {
+/* MOSAIC GRID */
+.mosaic {
   display: grid;
-  grid-template-columns: 1.65fr 1fr;
-  grid-template-rows: 240px 240px;
+  grid-template-columns: 2fr 1fr 1fr;
+  grid-template-rows: 260px 200px;
   gap: 3px;
+  border-radius: 0;
+  overflow: hidden;
 }
 
-.g-cell { overflow: hidden; position: relative; cursor: pointer; }
-.g-cell.main { grid-row: 1 / 3; }
-
-.g-cell img {
-  width: 100%; height: 100%;
-  object-fit: cover; display: block;
-  transition: transform .5s ease;
+/* CELLS */
+.mc {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+.mc.in {
+  opacity: 1;
+  transform: none;
 }
 
-.g-cell:hover img { transform: scale(1.05); }
+/* staggered entrance delays */
+.mc:nth-child(1) { transition-delay: 0.04s; }
+.mc:nth-child(2) { transition-delay: 0.14s; }
+.mc:nth-child(3) { transition-delay: 0.22s; }
+.mc:nth-child(4) { transition-delay: 0.30s; }
+.mc:nth-child(5) { transition-delay: 0.38s; }
 
-.g-cell::after {
-  content: ""; position: absolute; inset: 0;
-  background: linear-gradient(135deg, rgba(85,21,22,0.2) 0%, rgba(167,112,58,0.15) 100%);
-  transition: background .3s; pointer-events: none;
+/* hero cell spans both rows */
+.mc.hero { grid-row: 1 / 3; }
+
+/* IMAGES — full bleed, no black bars */
+.mc img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transition: transform 0.65s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.mc:hover img {
+  transform: scale(1.06);
 }
 
-.g-cell:hover::after { background: linear-gradient(135deg, rgba(85,21,22,0.05) 0%, rgba(167,112,58,0.05) 100%); }
+/* WARM TINT OVERLAY */
+.mc::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(160deg, rgba(85, 21, 22, 0.2) 0%, rgba(167, 112, 58, 0.13) 100%);
+  transition: opacity 0.35s ease;
+}
+.mc:hover::before {
+  opacity: 0.3;
+}
 
-.g-cell.more-cell img { filter: brightness(.45) sepia(0.2); }
+/* GOLD BORDER ON HOVER */
+.br {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  border: 1.5px solid rgba(167, 112, 58, 0);
+  transition: border-color 0.35s ease;
+}
+.mc:hover .br {
+  border-color: rgba(167, 112, 58, 0.55);
+}
 
-.g-more-label {
-  position: absolute; inset: 0;
-  display: flex; align-items: center; justify-content: center;
+/* +12 OVERLAY */
+.mc-over {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(26, 8, 5, 0.52);
+  transition: background 0.35s ease;
+}
+.mc:hover .mc-over {
+  background: rgba(26, 8, 5, 0.35);
+}
+
+.mc-over-rule {
+  width: 20px;
+  height: 1px;
+  background: #c9a96e;
+  opacity: 0.75;
+}
+
+.mc-over-n {
   font-family: 'Cormorant Garamond', serif;
-  font-size: 2.2rem; font-weight: 300;
-  color: white; z-index: 2; pointer-events: none;
-  text-shadow: 0 2px 15px rgba(0,0,0,0.5);
+  font-weight: 300;
+  font-size: 38px;
+  color: #f7f2ea;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+
+.mc-over-lbl {
+  font-size: 8px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: rgba(201, 169, 110, 0.9);
+}
+
+/* FOOTER - view all button only */
+.gw-foot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 14px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.65s ease 0.5s, transform 0.65s ease 0.5s;
+}
+.gw-foot.in {
+  opacity: 1;
+  transform: none;
 }
 
 .gallery-view-btn {
-  position: absolute; bottom: 20px; left: 50%;
-  transform: translateX(-50%);
-  background: rgba(247,242,234,.95);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(167,112,58,0.3);
-  padding: 10px 24px; border-radius: 99px;
-  font-family: 'DM Sans', sans-serif;
-  font-size: .88rem; font-weight: 500;
-  color: var(--red); cursor: pointer;
-  display: flex; align-items: center; gap: 8px;
-  box-shadow: 0 4px 20px rgba(0,0,0,.25);
-  transition: all .2s ease;
-  z-index: 4; white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: transparent;
+  border: 1px solid rgba(167, 112, 58, 0.35);
+  color: #a7703a;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 9px;
+  font-weight: 300;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  padding: 10px 22px;
+  cursor: pointer;
+  border-radius: 0;
+  transition: background 0.3s, border-color 0.3s, letter-spacing 0.3s, color 0.3s;
+}
+.gallery-view-btn:hover {
+  background: rgba(167, 112, 58, 0.07);
+  border-color: rgba(167, 112, 58, 0.7);
+  letter-spacing: 0.33em;
+  color: #c9893a;
+}
+.gallery-view-btn svg {
+  transition: transform 0.3s ease;
+  flex-shrink: 0;
+}
+.gallery-view-btn:hover svg {
+  transform: rotate(45deg);
 }
 
-.gallery-view-btn:hover {
-  background: var(--white);
-  transform: translateX(-50%) translateY(-2px);
-  border-color: var(--gold);
-  box-shadow: 0 8px 24px rgba(0,0,0,.3);
+/* Light box  */
+#lightbox {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(7, 5, 3, 0.92);
+  z-index: 9999;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  font-family: 'Montserrat', sans-serif;
+  user-select: none;
+}
+#lightbox.open {
+  display: flex;
+}
+
+/* vignette */
+#lightbox::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 35%, rgba(0, 0, 0, 0.65) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Top bar: dots + counter ── */
+#lb-topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 22px 60px 16px;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.55), transparent);
+  gap: 9px;
+}
+
+#lb-dots {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  max-width: calc(100vw - 120px);
+  overflow: hidden;
+}
+
+.lb-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.22);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.lb-dot.active {
+  background: #c9a96e;
+  width: 22px;
+  border-radius: 3px;
+}
+.lb-dot:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.5);
+  transform: scale(1.3);
+}
+
+#lb-counter {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-style: italic;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  color: rgba(201, 169, 110, 0.6);
+  text-transform: uppercase;
+  transition: opacity 0.3s;
+}
+
+/* ── Close button ── */
+#lbClose {
+  position: absolute;
+  top: 18px;
+  right: 22px;
+  z-index: 20;
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.5);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+#lbClose:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: rotate(90deg);
+}
+
+/* ── Stage ── */
+#lb-stage {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 80px;
+  box-sizing: border-box;
+  cursor: grab;
+}
+#lb-stage.dragging {
+  cursor: grabbing;
+}
+
+/* ── Main image ── */
+#lbImg {
+  max-width: 100%;
+  max-height: 78vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  border-radius: 2px;
+  pointer-events: none;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.03);
+  transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, opacity;
+}
+#lbImg.fading-out {
+  opacity: 0;
+  transform: scale(0.97);
+}
+
+/* ── Caption ── */
+#lb-caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  text-align: center;
+  padding: 12px 40px 22px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.6), transparent);
+  pointer-events: none;
+}
+#lb-alt {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 300;
+  font-style: italic;
+  font-size: 12px;
+  letter-spacing: 0.15em;
+  color: rgba(255, 255, 255, 0.38);
+  transition: opacity 0.4s;
+}
+
+/* ── Arrows ── */
+.lb-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 20px 12px;
+  opacity: 0.3;
+  transition: opacity 0.3s ease;
+}
+.lb-arrow:hover {
+  opacity: 1;
+}
+#lbPrev { left: 14px; }
+#lbNext { right: 14px; }
+
+.arrow-line {
+  width: 36px;
+  height: 1px;
+  background: #c9a96e;
+  position: relative;
+  transition: width 0.3s ease;
+}
+.lb-arrow:hover .arrow-line {
+  width: 50px;
+}
+.arrow-line::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  width: 8px;
+  height: 8px;
+  border-top: 1px solid #c9a96e;
+  border-right: 1px solid #c9a96e;
+}
+#lbPrev .arrow-line::after {
+  left: 0;
+  transform: rotate(-135deg);
+}
+#lbNext .arrow-line::after {
+  right: 0;
+  transform: rotate(45deg);
+}
+
+/* Drag hint */ 
+#lb-hint {
+  position: absolute;
+  bottom: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  color: rgba(255, 255, 255, 0.18);
+  white-space: nowrap;
+  text-transform: uppercase;
+  pointer-events: none;
+  transition: opacity 1.2s ease;
 }
 
 /* ─── OVERVIEW ──────────────────────────────────── */
@@ -857,38 +1198,99 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
   </div>
 </section>
 
-
 <!-- ════════════════════════════════════════════════
-     PAGE BODY — edit everything below freely
-     The hero above is the only auto-populated part
+     PAGE BODY
 ════════════════════════════════════════════════ -->
 
 <div class="page-wrap">
 
-  <!-- ① GALLERY — full bleed -->
-  <div class="gallery-wrap" id="galleryWrap">
-    <div class="gallery-grid">
-      <div class="g-cell main" data-idx="0">
-        <img src="https://images.unsplash.com/photo-1516426122078-c23e76319801?w=900&q=80" alt="Safari sunset">
-      </div>
-      <div class="g-cell" data-idx="1">
-        <img src="https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=600&q=80" alt="Acacia at sunset">
-      </div>
-      <div class="g-cell more-cell" data-idx="2">
-        <img src="https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=600&q=80" alt="Landscape">
-        <div class="g-more-label">+12 more</div>
-      </div>
+    <!-- ═══════════════════════════════════════════════
+     GALLERY SECTION
+     ═══════════════════════════════════════════════ -->
+<div class="gallery-wrap" id="galleryWrap">
+
+  <div class="mosaic">
+
+    <div class="mc hero" data-idx="0">
+      <img src="images/Amboseli1.jpg" alt="Marine reserve">
+      <div class="br"></div>
     </div>
-    <button class="gallery-view-btn" id="viewAllBtn">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+
+    <div class="mc" data-idx="1">
+      <img src="images/Amboseli2.jpg" alt="Coastal life">
+      <div class="br"></div>
+    </div>
+
+    <div class="mc" data-idx="2">
+      <img src="images/Amboseli3.jpg" alt="Wildlife">
+      <div class="br"></div>
+    </div>
+
+    <div class="mc" data-idx="3">
+      <img src="images/Amboseli4.jpg" alt="Sunrise">
+      <div class="br"></div>
+    </div>
+
+    <!-- +12 cell — clicking opens lightbox at index 4 -->
+    <div class="mc more-cell" data-idx="4">
+      <img src="images/Amboseli5.jpg" alt="More photos">
+      <div class="mc-over">
+        <div class="mc-over-rule"></div>
+        <div class="mc-over-n">+12</div>
+        <div class="mc-over-lbl">more photos</div>
+        <div class="mc-over-rule"></div>
+      </div>
+      <div class="br"></div>
+    </div>
+
+  </div>
+
+  <!-- View all button sits below the grid, no wrapper box -->
+  <div class="gw-foot" id="gwFoot">
+    <button class="gallery-view-btn" id="viewAllBtnMain">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
         <rect x="3" y="3" width="7" height="7" rx="1"/>
         <rect x="14" y="3" width="7" height="7" rx="1"/>
         <rect x="3" y="14" width="7" height="7" rx="1"/>
         <rect x="14" y="14" width="7" height="7" rx="1"/>
       </svg>
-      View All Photos
+      View all photos
     </button>
   </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     LIGHTBOX — place anywhere in <body>
+     ═══════════════════════════════════════════════ -->
+<div id="lightbox">
+
+  <!-- dots + counter -->
+  <div id="lb-topbar">
+    <div id="lb-dots"></div>
+    <div id="lb-counter"></div>
+  </div>
+
+  <!-- close -->
+  <button id="lbClose">&#10005;</button>
+
+  <!-- stage: drag area + arrows + photo -->
+  <div id="lb-stage">
+    <button class="lb-arrow" id="lbPrev"><div class="arrow-line"></div></button>
+    <img id="lbImg" src="" alt="" draggable="false">
+    <button class="lb-arrow" id="lbNext"><div class="arrow-line"></div></button>
+  </div>
+
+  <!-- caption -->
+  <div id="lb-caption">
+    <div id="lb-alt"></div>
+  </div>
+
+  <!-- drag hint fades out -->
+  <div id="lb-hint">drag to navigate</div>
+
+</div>
+
 
 
 <!-- ② OVERVIEW -->
@@ -1525,87 +1927,138 @@ window.addEventListener('scroll', () => {
 })();
 
 
-/* ══════════════════════════════════════════════════
-   3.  GALLERY LIGHTBOX
-══════════════════════════════════════════════════ */
+/* ═══════════════════════════════════════════════
+   3. GALLERY + LIGHTBOX — complete js
+   ═══════════════════════════════════════════════ */
 
+/* ── Full image list —  */
 const IMGS = [
-  { src:"https://images.unsplash.com/photo-1516426122078-c23e76319801?w=1200&q=85", alt:"Safari sunset" },
-  { src:"https://images.unsplash.com/photo-1547471080-7cc2caa01a7e?w=1200&q=85", alt:"Acacia at sunset" },
-  { src:"https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=1200&q=85", alt:"Misty landscape" },
-  { src:"https://images.unsplash.com/photo-1551632436-cbf8dd35adfa?w=1200&q=85", alt:"Elephants and Kilimanjaro" },
-  { src:"https://images.unsplash.com/photo-1504173010664-32509107de5c?w=1200&q=85", alt:"Serengeti plains" },
-  { src:"https://images.unsplash.com/photo-1564760290292-23341e4df6ec?w=1200&q=85", alt:"Samburu reserve" },
-  { src:"https://images.unsplash.com/photo-1534177616072-ef7dc120449d?w=1200&q=85", alt:"Lion on savanna" },
-  { src:"https://images.unsplash.com/photo-1612428977562-6ae16d9ef9e2?w=1200&q=85", alt:"Giraffe at golden hour" },
-  { src:"https://images.unsplash.com/photo-1549366021-9f761d450615?w=1200&q=85", alt:"Hot air balloon" },
-  { src:"https://images.unsplash.com/photo-1523805009345-7448845a9e53?w=1200&q=85", alt:"Maasai warrior" },
-  { src:"https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=1200&q=85", alt:"Wildebeest migration" },
-  { src:"https://images.unsplash.com/photo-1452378174528-3090a4bba7b2?w=1200&q=85", alt:"Leopard on tree" },
-  { src:"https://images.unsplash.com/photo-1551190822-a9333d879b1f?w=1200&q=85", alt:"Cheetah on plains" },
-  { src:"https://images.unsplash.com/photo-1583416750470-965b2707b355?w=1200&q=85", alt:"Buffalo herd" },
-  { src:"https://images.unsplash.com/photo-1559494007-9f5847c49d94?w=1200&q=85", alt:"Ocean sunset" },
+  { src: 'images/Amboseli1.jpg',        alt: 'Marine reserve'         },
+  { src: 'images/Amboseli2.jpg',  alt: 'Coastal life'           },
+  { src: 'images/Amboseli3.jpg',  alt: 'Wildlife'               },
+  { src: 'images/Amboseli4.jpg',  alt: 'Sunrise'                },
+  { src: 'images/Amboseli5.jpg',  alt: 'Watamu marine'          },
+  { src: 'images/Amboseli6.jpg',  alt: 'Misty landscape'        },
+  { src: 'images/Amboseli7.jpg',  alt: 'Elephants and Kilimanjaro' },
+  { src: 'images/Amboseli8.jpg',  alt: 'Serengeti plains'       },
+  { src: 'images/Amboseli9.jpg',  alt: 'Samburu reserve'        },
+  { src: 'images/Amboseli10.jpg', alt: 'Lion on savanna'        },
+  { src: 'images/Amboseli11.jpg', alt: 'Giraffe at golden hour' },
+  { src: 'images/Amboseli12.jpg', alt: 'Hot air balloon'        },
+  { src: 'images/Amboseli13.jpg', alt: 'Maasai warrior'         },
+  { src: 'images/Amboseli14.jpg', alt: 'Wildebeest migration'   },
+  { src: 'images/Amboseli15.jpg', alt: 'Leopard on tree'        },
 ];
 
+/* ── Element refs ── */
 const lb       = document.getElementById('lightbox');
 const lbImg    = document.getElementById('lbImg');
-const lbThumbs = document.getElementById('lbThumbs');
-const lbCount  = document.getElementById('lbCount');
-let cur  = 0;
-let busy = false;
+const lbDots   = document.getElementById('lb-dots');
+const lbCount  = document.getElementById('lb-counter');
+const lbAlt    = document.getElementById('lb-alt');
+const lbStage  = document.getElementById('lb-stage');
+const lbHint   = document.getElementById('lb-hint');
 
-function buildThumbs() {
-  lbThumbs.innerHTML = '';
-  IMGS.forEach((img, i) => {
-    const t = document.createElement('img');
-    t.className = 'lb-thumb' + (i === cur ? ' active' : '');
-    t.src = img.src.replace('w=1200','w=130');
-    t.alt = img.alt;
-    t.addEventListener('click', () => goTo(i));
-    lbThumbs.appendChild(t);
+let cur      = 0;
+let busy     = false;
+let hintTimer = null;
+
+/* ── drag state ── */
+let dragStartX = null;
+let dragDeltaX = 0;
+let isDragging = false;
+
+/*DOTS */
+function buildDots() {
+  lbDots.innerHTML = '';
+  IMGS.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'lb-dot' + (i === cur ? ' active' : '');
+    d.addEventListener('click', () => goTo(i));
+    lbDots.appendChild(d);
   });
 }
 
-function updateThumbState() {
-  document.querySelectorAll('.lb-thumb').forEach((t,j) => t.classList.toggle('active', j === cur));
-  const active = lbThumbs.querySelectorAll('.lb-thumb')[cur];
-  if (active) active.scrollIntoView({ behavior:'smooth', block:'nearest', inline:'center' });
+function syncDots() {
+  document.querySelectorAll('.lb-dot')
+    .forEach((d, i) => d.classList.toggle('active', i === cur));
 }
 
+/* NAVIGATE — smooth fade, no flash */
 function goTo(i) {
   if (busy) return;
   busy = true;
-  cur  = (i + IMGS.length) % IMGS.length;
-  lbImg.style.opacity = '0';
-  lbCount.textContent = (cur + 1) + ' / ' + IMGS.length;
-  updateThumbState();
-  const next    = new Image();
-  next.onload   = () => { lbImg.src = IMGS[cur].src; lbImg.alt = IMGS[cur].alt; lbImg.style.opacity = '1'; busy = false; };
-  next.onerror  = () => { lbImg.src = IMGS[cur].src; lbImg.style.opacity = '1'; busy = false; };
-  next.src = IMGS[cur].src;
+  cur = ((i % IMGS.length) + IMGS.length) % IMGS.length;
+
+  lbImg.classList.add('fading-out');
+  lbAlt.style.opacity  = '0';
+  lbCount.style.opacity = '0.3';
+  syncDots();
+
+  const preload    = new Image();
+  preload.onload   = loadDone;
+  preload.onerror  = loadDone;
+  preload.src      = IMGS[cur].src;
+
+  function loadDone() {
+    setTimeout(() => {
+      lbImg.src   = IMGS[cur].src;
+      lbImg.alt   = IMGS[cur].alt;
+      lbImg.classList.remove('fading-out');
+      lbAlt.textContent    = IMGS[cur].alt;
+      lbAlt.style.opacity  = '1';
+      lbCount.textContent  = (cur + 1) + ' / ' + IMGS.length;
+      lbCount.style.opacity = '1';
+      setTimeout(() => { busy = false; }, 500);
+    }, 60);
+  }
 }
 
+/*  OPEN LIGHTBOX */
 function openLb(i) {
-  cur = (i + IMGS.length) % IMGS.length;
+  cur = ((i % IMGS.length) + IMGS.length) % IMGS.length;
+
   lb.classList.add('open');
   document.body.style.overflow = 'hidden';
-  buildThumbs();
-  lbImg.src           = IMGS[cur].src;
-  lbImg.alt           = IMGS[cur].alt;
-  lbImg.style.opacity = '1';
-  lbCount.textContent = (cur + 1) + ' / ' + IMGS.length;
+
+  buildDots();
+
+  lbImg.src              = IMGS[cur].src;
+  lbImg.alt              = IMGS[cur].alt;
+  lbImg.classList.remove('fading-out');
+  lbAlt.textContent      = IMGS[cur].alt;
+  lbAlt.style.opacity    = '1';
+  lbCount.textContent    = (cur + 1) + ' / ' + IMGS.length;
+  lbCount.style.opacity  = '1';
+  lbHint.style.opacity   = '1';
+
+  clearTimeout(hintTimer);
+  hintTimer = setTimeout(() => { lbHint.style.opacity = '0'; }, 3500);
 }
 
+/* CLOSE LIGHTBOX */
 function closeLb() {
   lb.classList.remove('open');
   document.body.style.overflow = '';
+  clearTimeout(hintTimer);
 }
 
-document.getElementById('lbClose').addEventListener('click', closeLb);
-document.getElementById('lbPrev').addEventListener('click', () => goTo(cur - 1));
-document.getElementById('lbNext').addEventListener('click', () => goTo(cur + 1));
-lb.addEventListener('click', e => { if (e.target === lb) closeLb(); });
+/* BUTTON LISTENERS */
+document.getElementById('lbClose')
+  .addEventListener('click', closeLb);
 
+document.getElementById('lbPrev')
+  .addEventListener('click', () => goTo(cur - 1));
+
+document.getElementById('lbNext')
+  .addEventListener('click', () => goTo(cur + 1));
+
+/* clicking the dark backdrop closes lightbox */
+lb.addEventListener('click', e => {
+  if (e.target === lb) closeLb();
+});
+
+/* KEYBOARD */
 document.addEventListener('keydown', e => {
   if (!lb.classList.contains('open')) return;
   if (e.key === 'ArrowRight') goTo(cur + 1);
@@ -1613,12 +2066,97 @@ document.addEventListener('keydown', e => {
   if (e.key === 'Escape')     closeLb();
 });
 
-document.querySelectorAll('.g-cell').forEach(cell => {
-  cell.addEventListener('click', () => openLb(parseInt(cell.dataset.idx) || 0));
+/* MOUSE DRAG */
+lbStage.addEventListener('mousedown', e => {
+  if (e.target.closest('.lb-arrow') || e.target.id === 'lbClose') return;
+  dragStartX = e.clientX;
+  dragDeltaX = 0;
+  isDragging = false;
+  lbStage.classList.add('dragging');
+  e.preventDefault();
 });
 
-document.getElementById('viewAllBtn').addEventListener('click', () => openLb(0));
+window.addEventListener('mousemove', e => {
+  if (dragStartX === null) return;
+  dragDeltaX = e.clientX - dragStartX;
+  isDragging = Math.abs(dragDeltaX) > 5;
+  if (isDragging) {
+    const progress = Math.min(Math.abs(dragDeltaX) / 180, 1);
+    lbImg.style.transform  = `translateX(${dragDeltaX * 0.18}px) scale(${1 - progress * 0.025})`;
+    lbImg.style.transition = 'none';
+  }
+});
 
+window.addEventListener('mouseup', () => {
+  if (dragStartX === null) return;
+  lbStage.classList.remove('dragging');
+  lbImg.style.transition = '';
+  lbImg.style.transform  = '';
+  if (isDragging && Math.abs(dragDeltaX) > 60) {
+    dragDeltaX < 0 ? goTo(cur + 1) : goTo(cur - 1);
+  }
+  dragStartX = null;
+  dragDeltaX = 0;
+  isDragging = false;
+});
+
+/* TOUCH SWIPE */
+lbStage.addEventListener('touchstart', e => {
+  dragStartX = e.touches[0].clientX;
+  dragDeltaX = 0;
+  isDragging = false;
+  lbImg.style.transition = 'none';
+}, { passive: true });
+
+lbStage.addEventListener('touchmove', e => {
+  if (dragStartX === null) return;
+  dragDeltaX   = e.touches[0].clientX - dragStartX;
+  isDragging   = Math.abs(dragDeltaX) > 5;
+  if (isDragging) {
+    const progress = Math.min(Math.abs(dragDeltaX) / 180, 1);
+    lbImg.style.transform = `translateX(${dragDeltaX * 0.18}px) scale(${1 - progress * 0.025})`;
+  }
+}, { passive: true });
+
+lbStage.addEventListener('touchend', () => {
+  lbImg.style.transition = '';
+  lbImg.style.transform  = '';
+  if (isDragging && Math.abs(dragDeltaX) > 60) {
+    dragDeltaX < 0 ? goTo(cur + 1) : goTo(cur - 1);
+  }
+  dragStartX = null;
+  dragDeltaX = 0;
+  isDragging = false;
+});
+
+/* GALLERY GRID */
+document.querySelectorAll('.mc').forEach(cell => {
+  cell.addEventListener('click', () => {
+    openLb(parseInt(cell.dataset.idx) || 0);
+  });
+});
+
+/* View all — always start from image 0 */
+document.getElementById('viewAllBtnMain')
+  .addEventListener('click', () => openLb(0));
+
+/* ENTRANCE ANIMATIONS */
+const gwObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    e.target.classList.add('in');
+    gwObs.unobserve(e.target);
+  });
+}, { threshold: 0.06 });
+
+document.querySelectorAll('.mc').forEach(c => gwObs.observe(c));
+
+/* foot fades in after grid */
+setTimeout(() => {
+  const foot = document.getElementById('gwFoot');
+  if (foot) foot.classList.add('in');
+  document.querySelectorAll('.mc').forEach(c => c.classList.add('in'));
+}, 150);
 
 /* 4.  SIMILAR DESTINATIONS SLIDER */
 function slideSimExp(btn, dir) {
