@@ -88,14 +88,90 @@ nav.scrolled .nav-links a { color: #a7703a; }
   flex-direction: column;
   gap: 5px;
   cursor: pointer;
+  background: none;
+  border: none;
+  padding: 4px;
 }
 .nav-burger span {
   display: block;
-  height: 1.5px;
-  background: #551516;
-  transition: background 0.4s;
+  height: 2px;
+  background: #ffffff;
+  border-radius: 2px;
+  transition: transform 0.3s ease, opacity 0.2s ease, background 0.4s;
 }
-nav.scrolled .nav-burger span { background: var(--text-mid); }
+nav.scrolled .nav-burger span { background: #F9F5EF; }
+
+/* Burger open — animated X */
+.nav-burger.burger-open span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.nav-burger.burger-open span:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+.nav-burger.burger-open span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* ── MOBILE NAV — show burger, hide links ── */
+@media (max-width: 900px) {
+  nav {
+    padding: 0 24px;
+  }
+
+  .nav-burger {
+    display: flex;
+  }
+
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    align-items: flex-start;
+    position: fixed;
+    top: var(--nav-h);
+    left: 0;
+    right: 0;
+    background: #551516;
+    padding: 24px 32px 32px;
+    gap: 4px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    z-index: 99;
+    border-top: 1px solid rgba(167,112,58,0.3);
+  }
+
+  .nav-links.nav-open {
+    display: flex;
+  }
+
+  .nav-links li {
+    width: 100%;
+    border-bottom: 1px solid rgba(167,112,58,0.12);
+  }
+
+  .nav-links li:last-child {
+    border-bottom: none;
+    padding-top: 8px;
+  }
+
+  .nav-links a {
+    color: #F9F5EF !important;
+    font-size: 13px !important;
+    display: block;
+    padding: 12px 0;
+  }
+
+  .nav-links a:hover {
+    color: #a7703a !important;
+  }
+
+  .nav-cta {
+    display: inline-block !important;
+    text-align: center;
+    width: 100%;
+    padding: 14px 24px !important;
+    margin-top: 4px;
+  }
+}
 
 /* ── HERO ── */
 #hero {
@@ -238,6 +314,57 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
   animation: scrollPulse 2s 2s infinite;
 }
 
+/* Hero mobile fixes */
+@media (max-width: 768px) {
+  .hero-content {
+    padding: 0 32px;
+  }
+  .hero-title {
+    font-size: clamp(38px, 10vw, 58px);
+  }
+  .hero-sub {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  #hero {
+    justify-content: flex-end;
+    padding-bottom: 80px;
+  }
+  .hero-content {
+    padding: 0 20px;
+    max-width: 100%;
+  }
+  .hero-title {
+    font-size: clamp(34px, 11vw, 46px);
+    margin-bottom: 16px;
+  }
+  .hero-sub {
+    font-size: 13px;
+    line-height: 1.65;
+    margin-bottom: 28px;
+  }
+  .hero-btns {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .btn-primary,
+  .btn-outline {
+    text-align: center;
+    padding: 14px 20px;
+    width: 100%;
+  }
+  .hero-scroll {
+    display: none;
+  }
+  .hero-eyebrow {
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    margin-bottom: 16px;
+  }
+}
+
 /* ── VISUAL STRIP ── */
 #visual-strip { width: 100%; }
 .strip-grid {
@@ -271,10 +398,39 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
   letter-spacing: 0.02em;
 }
 
+/* Visual strip mobile — stack vertically */
+@media (max-width: 768px) {
+  .strip-grid {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  .strip-card {
+    height: 240px;
+  }
+  .strip-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .strip-label {
+    font-size: 28px;
+    bottom: 20px;
+    left: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .strip-card {
+    height: 200px;
+  }
+  .strip-label {
+    font-size: 24px;
+  }
+}
+
 /* ═══════════════════════════════════════════════════════════
    ABOUT SECTION  — Luxury Cinematic Redesign
-   Drop this into your stylesheet.
-   Requires: Cormorant Garamond + DM Sans (already in project)
 ═══════════════════════════════════════════════════════════ */
 
 /* ── Section shell ── */
@@ -302,7 +458,6 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* Slow subtle zoom — cinematic Ken Burns */
   animation: aboutVideoZoom 24s ease-in-out infinite alternate;
   will-change: transform;
 }
@@ -312,7 +467,6 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
   to   { transform: scale(1.06); }
 }
 
-/* Layered overlays */
 .about-overlay-base {
   position: absolute;
   inset: 0;
@@ -335,7 +489,6 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
   );
 }
 
-/* Subtle film grain */
 .about-overlay-grain {
   position: absolute;
   inset: 0;
@@ -351,7 +504,6 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
   align-items: center;
   gap: 14px;
   margin-bottom: 64px;
-  /* reveal animation */
   opacity: 0;
   transform: scaleX(0.4);
   transition: opacity 0.9s ease, transform 0.9s ease;
@@ -410,7 +562,6 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
   text-transform: uppercase;
   color: #a7703a;
   margin-bottom: 18px;
-  /* reveal */
   opacity: 0;
   transform: translateY(10px);
   transition: opacity 0.7s ease 0.2s, transform 0.7s ease 0.2s;
@@ -429,7 +580,6 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
   line-height: 0.95;
   letter-spacing: -1px;
   margin-bottom: 28px;
-  /* reveal */
   opacity: 0;
   transform: translateY(20px);
   transition: opacity 0.8s ease 0.35s, transform 0.8s ease 0.35s;
@@ -440,7 +590,6 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
   transform: none;
 }
 
-/* Vertical decorative rule under heading */
 .about-vert-rule {
   width: 1px;
   height: 0;
@@ -479,11 +628,9 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
-  /* also waits for section reveal */
   transition-delay: 0.5s;
 }
 
-/* If section not yet visible, keep hidden */
 #about:not(.about-visible) .about-slide.active {
   opacity: 0;
   transform: translateY(18px);
@@ -622,9 +769,8 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
   color: rgba(245, 245, 240, 0.55);
 }
 
-/* ── Auto-advance progress bar on each stat ── */
 .about-stat::after {
-  content: none; /* used for optional progress underline */
+  content: none;
 }
 
 /* ════════════════════════════════
@@ -653,7 +799,6 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
     min-height: auto;
   }
 
-  /* Stack columns vertically */
   .about-inner {
     flex-direction: column;
     align-items: center;
@@ -718,9 +863,6 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
 
 /* ════════════════════════════════════════════════════════
    EXPERIENCES SECTION — Luxury v4
-   #F9F5EF cream · #551516 burgundy · #a7703a gold · #02423e green
-   Changes: no arrows · balanced card heights · equal padding
-   both sides · burgundy L+bottom accent on hover
 ════════════════════════════════════════════════════════ */
 
 /* ── Shell ── */
@@ -924,14 +1066,13 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
   flex-shrink: 0;
 }
 
-/* ── Slider wrapper — NO arrows, equal padding both sides ── */
+/* ── Slider wrapper ── */
 .exp-slider-wrap { position: relative; }
 
-/* ── Track — equal padding left = right ── */
+/* ── Track ── */
 .exp-track {
   display: flex;
   gap: 18px;
-  /* equal 60px padding on both sides */
   padding: 24px 60px 28px;
   overflow-x: auto;
   scroll-behavior: smooth;
@@ -949,10 +1090,9 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
 .exp-track::-webkit-scrollbar { display: none; }
 .exp-track.dragging { cursor: grabbing; scroll-behavior: auto; }
 
-/* ── Card — fixed height so all cards are identical height ── */
+/* ── Card ── */
 .exp-card {
   flex: 0 0 290px;
-  /* Fixed total height keeps all cards uniform regardless of text length */
   height: 380px;
   border-radius: 8px;
   overflow: hidden;
@@ -962,7 +1102,6 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
   transition: box-shadow 0.38s ease, transform 0.1s ease;
   box-shadow: 0 4px 20px rgba(0,0,0,0.06), 0 1px 4px rgba(0,0,0,0.04);
   position: relative;
-  /* Stagger reveal */
   opacity: 0;
   animation: none;
 }
@@ -980,11 +1119,6 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
   box-shadow: 0 20px 50px rgba(85,21,22,0.14), 0 6px 16px rgba(0,0,0,0.08);
 }
 
-/* ── Burgundy L-border + bottom border on hover ──
-   Left bar: scaleY from centre outward
-   Bottom bar: scaleX from left to right
-   Both fully consistent across every card regardless of content
-── */
 .exp-card::before,
 .exp-card::after {
   content: '';
@@ -994,14 +1128,12 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
   z-index: 5;
   transition: transform 0.42s cubic-bezier(0.4,0,0.2,1);
 }
-/* Left bar */
 .exp-card::before {
   top: 0; left: 0;
   width: 3px; height: 100%;
   transform: scaleY(0);
   transform-origin: center;
 }
-/* Bottom bar */
 .exp-card::after {
   bottom: 0; left: 0;
   width: 100%; height: 3px;
@@ -1011,7 +1143,6 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
 .exp-card:hover::before { transform: scaleY(1); }
 .exp-card:hover::after  { transform: scaleX(1); }
 
-/* Card link wrapper */
 .exp-card-link {
   display: flex;
   flex-direction: column;
@@ -1021,7 +1152,7 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
   background: white;
 }
 
-/* ── Media — fixed height ── */
+/* ── Media ── */
 .exp-media {
   position: relative;
   height: 210px;
@@ -1037,7 +1168,6 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
 }
 .exp-card:hover .exp-media-img { transform: scale(1.06); }
 
-/* "Explore →" badge slides up on hover — no overlay */
 .exp-card-cta {
   position: absolute;
   bottom: 14px; right: 14px;
@@ -1057,7 +1187,6 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
 }
 .exp-card:hover .exp-card-cta { opacity: 1; transform: translateY(0); }
 
-/* Tag */
 .exp-tag {
   position: absolute;
   top: 12px; left: 12px;
@@ -1074,7 +1203,7 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
   padding: 4px 9px;
 }
 
-/* ── Card body — flex-grow so it fills the remaining height ── */
+/* ── Card body ── */
 .exp-body {
   flex: 1;
   display: flex;
@@ -1085,7 +1214,6 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
   overflow: hidden;
 }
 
-/* Gold shimmer sweep on body hover */
 .exp-body::before {
   content: '';
   position: absolute;
@@ -1111,10 +1239,9 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
   font-size: 11.5px; font-weight: 300;
   color: #02423e;
   line-height: 1.7;
-  flex: 1; /* pushes link to bottom consistently */
+  flex: 1;
 }
 
-/* Explore link — always at bottom */
 .exp-link {
   display: inline-flex;
   align-items: center;
@@ -1132,7 +1259,7 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
 .exp-card:hover .exp-link { color: #551516; gap: 9px; }
 .exp-card:hover .exp-link-arrow { transform: translateX(3px); }
 
-/* ── Footer row: scrollbar + dots ── */
+/* ── Footer row ── */
 .exp-footer-row {
   display: flex;
   align-items: center;
@@ -1140,7 +1267,6 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
   padding: 0 60px 8px;
 }
 
-/* Custom scroll progress bar */
 .exp-prog-wrap {
   flex: 1;
   height: 1.5px;
@@ -1156,7 +1282,6 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
   transition: width 0.45s cubic-bezier(0.4,0,0.2,1);
 }
 
-/* Dot pills */
 .exp-progress {
   display: flex;
   align-items: center;
@@ -1246,59 +1371,24 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
   .exp-tab-name { font-size: 10.5px; }
   .exp-cat-banner { padding: 14px 20px; flex-wrap: wrap; gap: 10px; }
   .exp-cat-count { display: none; }
-  /* Equal padding both sides on mobile */
-  .exp-track { padding: 18px 20px 22px; gap: 14px; }
-  .exp-card { flex: 0 0 260px; height: 400px; }
-  .exp-media { height: 185px; }
+
+  /* One full card + peek of next — consistent on every phone */
+  .exp-track {
+    padding: 18px 20px 22px;
+    gap: 14px;
+    scroll-padding-left: 20px;
+  }
+  .exp-card {
+    /* Full width minus the 20px padding on each side minus the 14px gap peek */
+    flex: 0 0 calc(100vw - 54px);
+    height: 390px;
+    /* Disable 3D tilt on mobile */
+    transform: none !important;
+  }
+  .exp-media { height: 200px; }
   .exp-footer-row { padding: 0 20px 8px; }
   .exp-cta-btn { width: calc(100% - 40px); justify-content: center; padding: 16px 24px; }
-  /* Disable 3D tilt on mobile */
-  .exp-card { transform: none !important; }
   .exp-cursor { display: none; }
-}
-
-/* Reuses your existing .btn-primary — or add this if needed: */
-/*
-.btn-primary {
-  display: inline-block;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 10.5px;
-  font-weight: 500;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: white;
-  background: #551516;
-  padding: 16px 40px;
-  border-radius: 2px;
-  text-decoration: none;
-  transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
-}
-.btn-primary:hover {
-  background: #3d0e0f;
-  transform: translateY(-2px);
-  box-shadow: 0 12px 28px rgba(85, 21, 22, 0.3);
-}
-*/
-
-/* ── Responsive ── */
-@media (max-width: 768px) {
-  #experiences { padding: 72px 0 80px; }
-
-  .exp-cat-header {
-    flex-wrap: wrap;
-    padding: 0 20px;
-  }
-
-  .exp-cat-header::after { left: 20px; right: 20px; }
-
-  .exp-cat-tagline { margin-left: 0; }
-
-  .exp-track { padding: 16px 20px 28px; }
-
-  .exp-card { flex: 0 0 290px; }
-
-  .exp-arrow.left  { left: 4px; }
-  .exp-arrow.right { right: 4px; }
 }
 
 /* HERO VIDEO BACKGROUND */
@@ -1311,10 +1401,8 @@ justify-content:center;
 color:white;
 text-align:center;
 position:relative;
-overflow:hidden; /* IMPORTANT */
+overflow:hidden;
 }
-
-/* video behaves like background image */
 
 .exp-hero video{
 position:absolute;
@@ -1326,8 +1414,6 @@ object-fit:cover;
 z-index:0;
 }
 
-/* dark overlay above video */
-
 .exp-hero::after{
 content:"";
 position:absolute;
@@ -1335,8 +1421,6 @@ inset:0;
 background:rgba(0,0,0,.35);
 z-index:1;
 }
-
-/* text always on top */
 
 .exp-hero-inner{
 position:relative;
@@ -1348,15 +1432,13 @@ letter-spacing:.04em;
 animation:fadeUp 1.2s ease;
 }
 
-/* image behaves EXACTLY like video */
-
 .exp-hero img{
 position:absolute;
 top:0;
 left:0;
 width:100%;
 height:100%;
-object-fit:cover; /* prevents stretching */
+object-fit:cover;
 z-index:0;
 display:none;
 }
@@ -1374,8 +1456,6 @@ transform:translateY(0);
 
 /* ════════════════════════════════════════════════════
    SERVICES SECTION — Luxury Redesign
-   Palette: #551516 bg · #a7703a gold · #02423e green
-   Compact horizontal rows — ~half the original height
 ════════════════════════════════════════════════════ */
 
 #services {
@@ -1386,7 +1466,6 @@ transform:translateY(0);
   isolation: isolate;
 }
 
-/* Ambient depth — green bleed bottom-right */
 .sv-ambient {
   position: absolute;
   inset: 0;
@@ -1412,7 +1491,6 @@ transform:translateY(0);
   justify-content: space-between;
   gap: 40px;
   margin-bottom: 44px;
-  /* reveal */
   opacity: 0;
   transform: translateY(18px);
   transition: opacity 0.8s ease, transform 0.8s ease;
@@ -1496,7 +1574,6 @@ transform:translateY(0);
   margin: 0;
 }
 
-/* Thin divider between rows */
 .sv-divider {
   height: 1px;
   background: rgba(167,112,58,0.12);
@@ -1511,7 +1588,6 @@ transform:translateY(0);
   padding: 28px 0;
   overflow: hidden;
   cursor: default;
-  /* reveal */
   opacity: 0;
   transform: translateX(-16px);
   transition:
@@ -1525,7 +1601,6 @@ transform:translateY(0);
 #services.sv-in .sv-item:nth-child(5) { opacity:1; transform:none; transition-delay:0.45s; }
 #services.sv-in .sv-item:nth-child(7) { opacity:1; transform:none; transition-delay:0.55s; }
 
-/* Hover state */
 .sv-item::before {
   content: '';
   position: absolute;
@@ -1541,7 +1616,6 @@ transform:translateY(0);
   opacity: 1;
 }
 
-/* Left: number + icon */
 .sv-item-left {
   display: flex;
   align-items: center;
@@ -1577,7 +1651,6 @@ transform:translateY(0);
   color: #c4934e;
 }
 
-/* Body: name + desc */
 .sv-item-body {
   flex: 1;
   padding: 0 40px 0 16px;
@@ -1613,7 +1686,6 @@ transform:translateY(0);
   color: rgba(249,245,239,0.62);
 }
 
-/* Right: arrow link */
 .sv-item-right {
   flex-shrink: 0;
   position: relative;
@@ -1650,7 +1722,6 @@ transform:translateY(0);
   transform: translateX(3px);
 }
 
-/* Watermark numeral */
 .sv-watermark {
   position: absolute;
   right: 70px;
@@ -1769,7 +1840,6 @@ transform:translateY(0);
     padding: 24px 0;
   }
 
-  /* On mobile: left sits in one row, body wraps below */
   .sv-item-left {
     width: auto;
     gap: 14px;
@@ -1804,43 +1874,6 @@ transform:translateY(0);
     padding: 17px 24px;
   }
 }
-
-
-/* ── WHY US ── */
-/*
-#why-us { background: var(--dark); padding: 120px 48px; }
-#why-us .section-eyebrow { color: var(--gold); }
-#why-us .section-title { color: var(--white); margin-bottom: 80px; }
-.pillars-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 40px;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-.pillar { text-align: center; padding: 0 16px; }
-.pillar-icon {
-  width: 64px; height: 64px;
-  border: 1px solid rgba(184,137,58,0.35);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 16px;
-  color: var(--gold);
-}
-.pillar-icon svg { width: 24px; height: 24px; }
-.pillar-dot { width: 5px; height: 5px; background: var(--gold); border-radius: 50%; margin: 0 auto 20px; }
-.pillar-name {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 22px;
-  font-weight: 400;
-  color: var(--white);
-  margin-bottom: 14px;
-  line-height: 1.2;
-}
-.pillar-desc { font-size: 13px; font-weight: 300; color: rgba(255,255,255,0.5); line-height: 1.75; }
-*/
 
 
 /* ── STORIES ── */
@@ -1882,11 +1915,35 @@ transform:translateY(0);
   color: var(--gold);
 }
 
+/* Stories responsive */
+@media (max-width: 1024px) {
+  .stories-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  #stories {
+    padding: 72px 20px;
+  }
+  .stories-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .story-quote {
+    padding: 28px 24px;
+  }
+  .quote-mark {
+    font-size: 56px;
+  }
+  .quote-text {
+    font-size: 18px;
+  }
+}
+
 /* ════════════════════════════════════════════════════
    CONTACT SECTION — Luxury Redesign
-   Palette: #551516 burgundy · #a7703a gold
-            #F9F5EF cream  · #02423e deep green
-   Requires: Cormorant Garamond + DM Sans
 ════════════════════════════════════════════════════ */
 
 /* ── Variables ── */
@@ -1989,7 +2046,6 @@ transform:translateY(0);
   margin-bottom: 52px;
 }
 
-/* Contact info */
 .ct-info-block {
   display: flex;
   flex-direction: column;
@@ -2039,7 +2095,6 @@ a.ct-info-row:hover .ct-info-value {
   color: var(--ct-cream);
 }
 
-/* Ornament */
 .ct-ornament {
   display: flex;
   flex-direction: column;
@@ -2094,7 +2149,6 @@ a.ct-info-row:hover .ct-info-value {
     0 10px 30px rgba(0,0,0,0.25);
 }
 
-/* Burgundy top-border accent */
 .ct-form-card::before {
   content: '';
   position: absolute;
@@ -2141,7 +2195,6 @@ a.ct-info-row:hover .ct-info-value {
   transition: color 0.3s;
 }
 
-/* ── Panel title ── */
 .ct-panel-title {
   font-family: 'Cormorant Garamond', serif;
   font-size: 22px;
@@ -2151,7 +2204,6 @@ a.ct-info-row:hover .ct-info-value {
   letter-spacing: 0.02em;
 }
 
-/* ── Step panels ── */
 .ct-step-panel {
   animation: ctSlideIn 0.45s cubic-bezier(0.4,0,0.2,1);
 }
@@ -2165,14 +2217,12 @@ a.ct-info-row:hover .ct-info-value {
   to   { opacity: 1; transform: none; }
 }
 
-/* ── Grid ── */
 .ct-grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0 32px;
 }
 
-/* ── Field ── */
 .ct-field {
   position: relative;
   margin-bottom: 32px;
@@ -2220,7 +2270,6 @@ a.ct-info-row:hover .ct-info-value {
   display: block;
 }
 
-/* Gold animated underline */
 .ct-line {
   display: block;
   position: absolute;
@@ -2243,7 +2292,6 @@ a.ct-info-row:hover .ct-info-value {
   border-bottom-color: transparent;
 }
 
-/* ── Experience tiles ── */
 .ct-tiles {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -2299,7 +2347,6 @@ a.ct-info-row:hover .ct-info-value {
 
 .ct-tile-name { position: relative; z-index: 1; }
 
-/* ── Guest counter ── */
 .ct-guests {
   display: flex;
   align-items: center;
@@ -2348,7 +2395,6 @@ a.ct-info-row:hover .ct-info-value {
   transform: scale(1.25);
 }
 
-/* ── Select ── */
 .ct-select-shell {
   position: relative;
   margin-top: 0;
@@ -2390,7 +2436,6 @@ a.ct-info-row:hover .ct-info-value {
   pointer-events: none;
 }
 
-/* ── Actions ── */
 .ct-actions {
   margin-top: 8px;
   display: flex;
@@ -2400,7 +2445,6 @@ a.ct-info-row:hover .ct-info-value {
 .ct-actions--right  { justify-content: flex-end; }
 .ct-actions--split  { justify-content: space-between; }
 
-/* Next button */
 .ct-btn-next {
   display: inline-flex;
   align-items: center;
@@ -2434,7 +2478,6 @@ a.ct-info-row:hover .ct-info-value {
 
 .ct-btn-next:hover svg { transform: translateX(4px); }
 
-/* Back button */
 .ct-btn-back {
   display: inline-flex;
   align-items: center;
@@ -2465,7 +2508,6 @@ a.ct-info-row:hover .ct-info-value {
 
 .ct-btn-back:hover svg { transform: translateX(-4px); }
 
-/* Submit button */
 .ct-btn-submit {
   display: inline-flex;
   align-items: center;
@@ -2505,7 +2547,6 @@ a.ct-info-row:hover .ct-info-value {
   pointer-events: none;
 }
 
-/* Privacy note */
 .ct-privacy {
   font-family: 'DM Sans', sans-serif;
   font-size: 11px;
@@ -2516,7 +2557,6 @@ a.ct-info-row:hover .ct-info-value {
   letter-spacing: 0.02em;
 }
 
-/* ── Validation shake ── */
 @keyframes ctShake {
   0%,100% { transform: translateX(0); }
   20%      { transform: translateX(-5px); }
@@ -2538,7 +2578,6 @@ a.ct-info-row:hover .ct-info-value {
   border-radius: 2px;
 }
 
-/* ── Success screen ── */
 .ct-success {
   display: none;
   flex-direction: column;
@@ -2657,7 +2696,6 @@ a.ct-info-row:hover .ct-info-value {
     gap: 0;
   }
 
-  /* Tiles: 2 columns on mobile */
   .ct-tiles {
     grid-template-columns: repeat(2, 1fr);
     gap: 8px;
@@ -2713,11 +2751,6 @@ a.ct-info-row:hover .ct-info-value {
 
 /* ════════════════════════════════════════════════════
    FOOTER — Luxury Redesign
-   Palette:
-     Background  #551516  (burgundy)
-     Gold        #a7703a
-     Deep green  #02423e
-     Cream       #F9F5EF
 ════════════════════════════════════════════════════ */
 
 footer#footer {
@@ -2728,7 +2761,6 @@ footer#footer {
   isolation: isolate;
 }
 
-/* Ambient texture — deep green shadow bottom-right */
 footer#footer::before {
   content: '';
   position: absolute;
@@ -2796,7 +2828,6 @@ footer#footer.ft-in .ft-top-rule {
 
 footer#footer.ft-in .ft-brand { opacity: 1; transform: none; }
 
-/* Logo */
 .ft-logo {
   display: flex;
   align-items: center;
@@ -2853,7 +2884,6 @@ footer#footer.ft-in .ft-brand { opacity: 1; transform: none; }
   margin-bottom: 28px;
 }
 
-/* Social */
 .ft-social-label {
   font-family: 'DM Sans', sans-serif;
   font-size: 8.5px;
@@ -2971,7 +3001,6 @@ footer#footer.ft-in .ft-col:nth-child(4) { opacity: 1; transform: none; transiti
   margin-right: 6px;
 }
 
-/* Contact rows */
 .ft-contact-row {
   display: block;
   text-decoration: none;
@@ -3014,7 +3043,6 @@ a.ft-contact-row:hover .ft-contact-val {
   color: rgba(249,245,239,0.85);
 }
 
-/* CTA button */
 .ft-cta {
   display: inline-flex;
   align-items: center;

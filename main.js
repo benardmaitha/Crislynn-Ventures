@@ -52,19 +52,34 @@ window.location.href = link.getAttribute("href");
 
 // ── MOBILE NAV ──
 const navBurger = document.getElementById('navBurger');
-const navLinks = document.querySelector('.nav-links');
-if (navBurger) {
-  navBurger.addEventListener('click', () => {
-    const isOpen = navLinks.style.display === 'flex';
-    navLinks.style.display = isOpen ? 'none' : 'flex';
-    navLinks.style.flexDirection = 'column';
-    navLinks.style.position = 'absolute';
-    navLinks.style.top = '80px';
-    navLinks.style.left = '0';
-    navLinks.style.right = '0';
-    navLinks.style.background = 'rgba(245,240,232,0.98)';
-    navLinks.style.padding = '24px 48px';
-    navLinks.style.gap = '20px';
+const navLinks  = document.querySelector('.nav-links');
+
+if (navBurger && navLinks) {
+  let navOpen = false;
+
+  navBurger.addEventListener('click', (e) => {
+    e.stopPropagation();
+    navOpen = !navOpen;
+    navLinks.classList.toggle('nav-open', navOpen);
+    navBurger.classList.toggle('burger-open', navOpen);
+  });
+
+  // Close nav when a link is clicked
+  navLinks.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      navOpen = false;
+      navLinks.classList.remove('nav-open');
+      navBurger.classList.remove('burger-open');
+    });
+  });
+
+  // Close nav on outside click
+  document.addEventListener('click', (e) => {
+    if (navOpen && !navBurger.contains(e.target) && !navLinks.contains(e.target)) {
+      navOpen = false;
+      navLinks.classList.remove('nav-open');
+      navBurger.classList.remove('burger-open');
+    }
   });
 }
 
@@ -84,8 +99,6 @@ function handleSubmit(e) {
 
 /* ═══════════════════════════════════════════════════════════
    ABOUT SECTION — Script
-   Paste just before your closing </body> tag,
-   or add to your existing JS file.
 ═══════════════════════════════════════════════════════════ */
 
 (function () {
@@ -100,7 +113,7 @@ function handleSubmit(e) {
         if (entry.isIntersecting) {
           aboutSection.classList.add('about-visible');
           sectionObserver.unobserve(aboutSection);
-          startCounters();   // fire counters once visible
+          startCounters();
         }
       });
     },
@@ -134,12 +147,11 @@ function handleSubmit(e) {
     autoTimer = setInterval(nextSlide, 4500);
   }
 
-  // Dot click
   dots.forEach(function (dot) {
     dot.addEventListener('click', function () {
       var idx = parseInt(dot.getAttribute('data-slide'), 10);
       showSlide(idx);
-      startAuto(); // reset timer on manual click
+      startAuto();
     });
   });
 
@@ -156,11 +168,11 @@ function handleSubmit(e) {
     var counters = aboutSection.querySelectorAll('.counter');
     counters.forEach(function (el) {
       var target   = parseInt(el.getAttribute('data-target'), 10);
-      var duration = 1800; // ms
+      var duration = 1800;
       var start    = null;
 
       function easeOut(t) {
-        return 1 - Math.pow(1 - t, 3); // cubic ease-out
+        return 1 - Math.pow(1 - t, 3);
       }
 
       function step(timestamp) {
@@ -174,7 +186,6 @@ function handleSubmit(e) {
         }
       }
 
-      // Small delay so counters start after the stat block fades in (~0.9s)
       setTimeout(function () {
         requestAnimationFrame(step);
       }, 950);
@@ -185,15 +196,11 @@ function handleSubmit(e) {
 
 /* ════════════════════════════════════════════════════
    EXPERIENCES SECTION — Luxury v4 Script
-   No side arrows · fixed card height · equal padding
-   Paste before </body> or merge into main.js
 ════════════════════════════════════════════════════ */
 
 (function () {
 
-  var CARD_W   = 290;
   var CARD_GAP = 18;
-  var STEP     = CARD_W + CARD_GAP;
 
   var state = [
     { idx:0, dragging:false, startX:0, scrollStart:0 },
@@ -203,9 +210,19 @@ function handleSubmit(e) {
 
   function getTrack(cat)     { return document.getElementById('track-' + cat); }
   function getCardCount(cat) { var t = getTrack(cat); return t ? t.querySelectorAll('.exp-card').length : 0; }
+
+  /* Always measure the real rendered card width so mobile flex-basis is respected */
+  function getStep(cat) {
+    var t = getTrack(cat); if (!t) return 308;
+    var card = t.querySelector('.exp-card');
+    if (!card) return 308;
+    return card.offsetWidth + CARD_GAP;
+  }
+
   function getVisible(cat) {
     var t = getTrack(cat); if (!t) return 1;
-    return Math.max(1, Math.floor((t.clientWidth - 120) / STEP));
+    var step = getStep(cat);
+    return Math.max(1, Math.floor(t.clientWidth / step));
   }
 
   /* Progress bar */
@@ -236,16 +253,16 @@ function handleSubmit(e) {
 
   /* Navigation */
   function goTo(cat, idx) {
-    var max = getCardCount(cat) - getVisible(cat);
+    var max = getCardCount(cat) - 1;
     idx = Math.max(0, Math.min(idx, max));
     state[cat].idx = idx;
-    var t = getTrack(cat);
-    t.scrollTo({ left: idx * STEP, behavior: 'smooth' });
+    var t    = getTrack(cat);
+    var step = getStep(cat);
+    t.scrollTo({ left: idx * step, behavior: 'smooth' });
     updateDots(cat);
     updateProgress(cat);
   }
 
-  /* Exposed for possible external use */
   window.slide = function(cat, dir){ goTo(cat, state[cat].idx + dir); };
 
   /* Mouse drag */
@@ -263,7 +280,8 @@ function handleSubmit(e) {
     if (!state[cat].dragging) return;
     state[cat].dragging = false;
     getTrack(cat).classList.remove('dragging');
-    goTo(cat, Math.round((getTrack(cat).scrollLeft / STEP)));
+    var step = getStep(cat);
+    goTo(cat, Math.round(getTrack(cat).scrollLeft / step));
   };
 
   /* Touch */
@@ -284,7 +302,8 @@ function handleSubmit(e) {
     t.addEventListener('scroll', function(){
       if (!tick) {
         requestAnimationFrame(function(){
-          var idx = Math.round((t.scrollLeft) / STEP);
+          var step = getStep(cat);
+          var idx  = Math.round(t.scrollLeft / step);
           if (state[cat].idx !== idx){ state[cat].idx = idx; updateDots(cat); updateProgress(cat); }
           tick = false;
         });
@@ -306,9 +325,6 @@ function handleSubmit(e) {
     card.style.transform  = 'perspective(1200px) rotateX(0) rotateY(0) translateZ(0)';
     card.style.transition = 'box-shadow 0.5s, transform 0.5s ease';
   };
-
-  /* Custom drag cursor */
-  var section = document.getElementById('experiences');
 
   /* Tab ink + scroll-spy */
   var tabs = document.querySelectorAll('.exp-tab');
@@ -353,6 +369,7 @@ function handleSubmit(e) {
   }, { passive:true });
 
   /* Scroll reveal */
+  var section = document.getElementById('experiences');
   if (section) {
     new IntersectionObserver(function(e,o){ if(e[0].isIntersecting){ section.classList.add('exp-in'); o.disconnect(); }},{ threshold:0.06 }).observe(section);
   }
@@ -367,15 +384,6 @@ function handleSubmit(e) {
 
 /* ════════════════════════════════════════════════════
    CONTACT SECTION — Script
-   Paste just before </body> or merge into your JS.
-
-   EMAIL DELIVERY via FormSubmit.co (free, no backend):
-   1. On the very first real submission, FormSubmit sends
-      a confirmation email to karibu@crislynnventures.co.ke
-   2. Click the activation link once.
-   3. Done — every submission arrives as a clean table:
-      Full Name | Email | Phone | Dates | Experience |
-      Guests | Dream Journey Details | How They Heard
 ════════════════════════════════════════════════════ */
 
 (function () {
@@ -440,7 +448,6 @@ function handleSubmit(e) {
       if (p2) { p2.classList.remove('ct-step-panel--hidden'); p2.style.animation = 'none'; p2.offsetHeight; p2.style.animation = ''; }
       if (fill) fill.style.width = '100%';
       if (lbl)  lbl.textContent  = '02 / 02';
-      /* Scroll form top into view on mobile */
       var card = section.querySelector('.ct-form-card');
       if (card && window.innerWidth < 960) {
         card.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -454,17 +461,14 @@ function handleSubmit(e) {
     var expEl   = document.getElementById('ctExp');
     var valid   = true;
 
-    /* Validate name */
     if (!nameEl || !nameEl.value.trim()) {
       markErr(nameEl); valid = false;
     } else { clearErr(nameEl); }
 
-    /* Validate email */
     if (!emailEl || !emailEl.value.trim() || !/\S+@\S+\.\S+/.test(emailEl.value)) {
       markErr(emailEl); valid = false;
     } else { clearErr(emailEl); }
 
-    /* Validate experience selection */
     if (!expEl || !expEl.value) {
       var wrap = document.getElementById('ctTiles');
       if (wrap) { wrap.classList.add('ct-err'); wrap.style.animation = 'none'; wrap.offsetHeight; wrap.style.animation = ''; }
@@ -501,7 +505,6 @@ function handleSubmit(e) {
     form.addEventListener('submit', function (e) {
       e.preventDefault();
 
-      /* Validate step 2 message */
       var msgEl = document.getElementById('ctMsg');
       if (!msgEl || !msgEl.value.trim()) {
         markErr(msgEl); return;
@@ -517,12 +520,10 @@ function handleSubmit(e) {
         body: new FormData(form),
         headers: { 'Accept': 'application/json' }
       })
-      .then(function (res) {
-        /* FormSubmit returns a redirect — treat any response as success */
+      .then(function () {
         showSuccess();
       })
       .catch(function () {
-        /* Network fallback — let the browser POST normally */
         form.submit();
       });
     });
@@ -547,11 +548,9 @@ function handleSubmit(e) {
     if (formEl) { formEl.reset(); formEl.style.display = ''; }
     if (sucEl)  sucEl.classList.remove('ct-show');
 
-    /* Clear tiles */
     tiles.forEach(function (t) { t.classList.remove('ct-sel'); });
     if (expHid) expHid.value = '';
 
-    /* Reset guests */
     gCount = 2;
     ctAdjGuests(0);
 
@@ -562,7 +561,6 @@ function handleSubmit(e) {
 
 /* ════════════════════════════════════════════════
    FOOTER — Scroll reveal
-   Paste before </body> or merge into main.js
 ════════════════════════════════════════════════ */
 
 (function () {
@@ -579,7 +577,6 @@ function handleSubmit(e) {
 
 /* ════════════════════════════════════════════
    SERVICES SECTION — Scroll reveal
-   Paste before </body> or merge into main.js
 ════════════════════════════════════════════ */
 
 (function () {
