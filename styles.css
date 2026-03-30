@@ -1071,20 +1071,18 @@ nav.scrolled .nav-burger span { background: #F9F5EF; }
 
 /* ── Track ── */
 .exp-track {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 18px;
   padding: 24px 60px 28px;
-  overflow-x: auto;
+  overflow-x: visible;
   scroll-behavior: smooth;
-  scroll-snap-type: x mandatory;
+  scroll-snap-type: none;
   -ms-overflow-style: none;
   scrollbar-width: none;
   cursor: default;
   user-select: none;
   -webkit-user-select: none;
-}
-.your-track-class {
-  scroll-padding-left: 60px;
 }
 
 .exp-track::-webkit-scrollbar { display: none; }
@@ -1092,7 +1090,8 @@ nav.scrolled .nav-burger span { background: #F9F5EF; }
 
 /* ── Card ── */
 .exp-card {
-  flex: 0 0 290px;
+  flex: none;
+  width: 100%;
   height: 380px;
   border-radius: 8px;
   overflow: hidden;
@@ -1354,7 +1353,18 @@ nav.scrolled .nav-burger span { background: #F9F5EF; }
   .exp-intro { border-left: none; padding-left: 0; border-top: 1px solid rgba(167,112,58,0.25); padding-top: 16px; }
   .exp-tabs-wrap { padding: 0 40px; }
   .exp-cat-banner { padding: 16px 40px; }
-  .exp-track { padding: 20px 40px 24px; }
+  .exp-track {
+    display: flex;
+    grid-template-columns: none;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-left: 40px;
+    padding: 20px 40px 24px;
+  }
+  .exp-card {
+    flex: 0 0 270px;
+    width: 270px;
+  }
   .exp-footer-row { padding: 0 40px 8px; }
 }
 
@@ -1374,15 +1384,18 @@ nav.scrolled .nav-burger span { background: #F9F5EF; }
 
   /* One full card + peek of next — consistent on every phone */
   .exp-track {
+    display: flex;
+    grid-template-columns: none;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-left: 20px;
     padding: 18px 20px 22px;
     gap: 14px;
-    scroll-padding-left: 20px;
   }
   .exp-card {
-    /* Full width minus the 20px padding on each side minus the 14px gap peek */
     flex: 0 0 calc(100vw - 54px);
+    width: calc(100vw - 54px);
     height: 390px;
-    /* Disable 3D tilt on mobile */
     transform: none !important;
   }
   .exp-media { height: 200px; }
