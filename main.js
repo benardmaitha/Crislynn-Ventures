@@ -196,6 +196,9 @@ function handleSubmit(e) {
 
 /* ════════════════════════════════════════════════════
    EXPERIENCES SECTION — Luxury v4 Script
+   Smooth scroll: CSS snap does all the snapping.
+   JS only reads position after scrollend (or fallback
+   timeout) — never fights the browser mid-scroll.
 ════════════════════════════════════════════════════ */
 
 (function () {
@@ -203,15 +206,15 @@ function handleSubmit(e) {
   var CARD_GAP = 18;
 
   var state = [
-    { idx:0, dragging:false, startX:0, scrollStart:0 },
-    { idx:0, dragging:false, startX:0, scrollStart:0 },
-    { idx:0, dragging:false, startX:0, scrollStart:0 },
+    { idx:0, dragging:false, startX:0, scrollStart:0, scrollTimer:null },
+    { idx:0, dragging:false, startX:0, scrollStart:0, scrollTimer:null },
+    { idx:0, dragging:false, startX:0, scrollStart:0, scrollTimer:null },
   ];
 
   function getTrack(cat)     { return document.getElementById('track-' + cat); }
   function getCardCount(cat) { var t = getTrack(cat); return t ? t.querySelectorAll('.exp-card').length : 0; }
 
-  /* Always measure the real rendered card width so mobile flex-basis is respected */
+  /* Measure real rendered card width every time — respects mobile flex-basis */
   function getStep(cat) {
     var t = getTrack(cat); if (!t) return 308;
     var card = t.querySelector('.exp-card');
@@ -221,11 +224,10 @@ function handleSubmit(e) {
 
   function getVisible(cat) {
     var t = getTrack(cat); if (!t) return 1;
-    var step = getStep(cat);
-    return Math.max(1, Math.floor(t.clientWidth / step));
+    return Math.max(1, Math.floor(t.clientWidth / getStep(cat)));
   }
 
-  /* Progress bar */
+  /* ── UI updates ── */
   function updateProgress(cat) {
     var bar = document.getElementById('prog-' + cat); if (!bar) return;
     var max = Math.max(1, getCardCount(cat) - getVisible(cat));
@@ -233,7 +235,6 @@ function handleSubmit(e) {
     bar.style.width = pct + '%';
   }
 
-  /* Dots */
   function buildDots(cat) {
     var el = document.getElementById('dots-' + cat); if (!el) return;
     el.innerHTML = '';
@@ -251,13 +252,15 @@ function handleSubmit(e) {
     });
   }
 
-  /* Navigation */
+  /* ── Core navigation: let CSS smooth-scroll + snap do the work ── */
   function goTo(cat, idx) {
     var max = getCardCount(cat) - 1;
     idx = Math.max(0, Math.min(idx, max));
     state[cat].idx = idx;
     var t    = getTrack(cat);
     var step = getStep(cat);
+    /* CSS scroll-behavior:smooth + scroll-snap-type handles the animation.
+       We just set the target position. */
     t.scrollTo({ left: idx * step, behavior: 'smooth' });
     updateDots(cat);
     updateProgress(cat);
@@ -265,68 +268,99 @@ function handleSubmit(e) {
 
   window.slide = function(cat, dir){ goTo(cat, state[cat].idx + dir); };
 
-  /* Mouse drag */
+  /* ── Mouse drag (desktop only) ──
+     During drag: temporarily disable scroll-snap so the track
+     follows the finger freely. Re-enable and snap on release. */
   window.dragStart = function(e, cat){
     if (window.innerWidth <= 600) return;
-    state[cat].dragging = true; state[cat].startX = e.pageX;
-    state[cat].scrollStart = getTrack(cat).scrollLeft;
-    getTrack(cat).classList.add('dragging');
+    var t = getTrack(cat);
+    state[cat].dragging    = true;
+    state[cat].startX      = e.pageX;
+    state[cat].scrollStart = t.scrollLeft;
+    /* Disable snap while dragging so it doesn't fight the mouse */
+    t.style.scrollSnapType = 'none';
+    t.style.scrollBehavior = 'auto';
+    t.classList.add('dragging');
   };
+
   window.dragMove = function(e, cat){
-    if (!state[cat].dragging) return; e.preventDefault();
+    if (!state[cat].dragging) return;
+    e.preventDefault();
     getTrack(cat).scrollLeft = state[cat].scrollStart - (e.pageX - state[cat].startX);
   };
+
   window.dragEnd = function(cat){
     if (!state[cat].dragging) return;
     state[cat].dragging = false;
-    getTrack(cat).classList.remove('dragging');
+    var t    = getTrack(cat);
     var step = getStep(cat);
-    goTo(cat, Math.round(getTrack(cat).scrollLeft / step));
+    var idx  = Math.round(t.scrollLeft / step);
+    /* Re-enable snap, then animate to the snapped position */
+    t.style.scrollSnapType = '';
+    t.style.scrollBehavior = '';
+    t.classList.remove('dragging');
+    goTo(cat, idx);
   };
 
-  /* Touch */
+  /* ── Touch (mobile): let native scroll-snap handle everything ──
+     We don't manually move scrollLeft on touch — the browser's
+     momentum scroll + snap is silky on iOS/Android by itself. */
   window.touchStart = function(e, cat){
-    state[cat].startX = e.touches[0].pageX;
+    /* Just record for potential swipe detection — no scrollLeft overrides */
+    state[cat].startX      = e.touches[0].pageX;
     state[cat].scrollStart = getTrack(cat).scrollLeft;
-    state[cat].dragging = true;
-  };
-  window.touchMove = function(e, cat){
-    if (!state[cat].dragging) return;
-    getTrack(cat).scrollLeft = state[cat].scrollStart - (e.touches[0].pageX - state[cat].startX);
+    state[cat].dragging    = true;
   };
 
-  /* Sync on native scroll */
+  window.touchMove = function(e, cat){
+    /* Do nothing — let the browser handle touch scrolling natively.
+       Overriding scrollLeft here is what caused the glitch. */
+  };
+
+  /* ── Read index after scroll settles ──
+     'scrollend' is modern; timeout fallback for older browsers.
+     We only READ here — never write scrollLeft — so no fighting. */
   [0,1,2].forEach(function(cat){
     var t = getTrack(cat); if (!t) return;
-    var tick = false;
-    t.addEventListener('scroll', function(){
-      if (!tick) {
-        requestAnimationFrame(function(){
-          var step = getStep(cat);
-          var idx  = Math.round(t.scrollLeft / step);
-          if (state[cat].idx !== idx){ state[cat].idx = idx; updateDots(cat); updateProgress(cat); }
-          tick = false;
-        });
-        tick = true;
+
+    function onScrollSettle() {
+      var step = getStep(cat);
+      var idx  = Math.round(t.scrollLeft / step);
+      idx = Math.max(0, Math.min(idx, getCardCount(cat) - 1));
+      if (state[cat].idx !== idx) {
+        state[cat].idx = idx;
+        updateDots(cat);
+        updateProgress(cat);
       }
-    });
+    }
+
+    /* Modern browsers: fires once scroll animation fully ends */
+    if ('onscrollend' in t) {
+      t.addEventListener('scrollend', onScrollSettle, { passive: true });
+    }
+
+    /* Fallback: debounce the scroll event — wait 120ms of silence */
+    t.addEventListener('scroll', function(){
+      clearTimeout(state[cat].scrollTimer);
+      state[cat].scrollTimer = setTimeout(onScrollSettle, 120);
+    }, { passive: true });
   });
 
-  /* 3D tilt (desktop only) */
+  /* ── 3D tilt (desktop only) ── */
   window.tiltCard = function(e, card){
     if (window.innerWidth <= 600) return;
-    var r = card.getBoundingClientRect();
+    var r  = card.getBoundingClientRect();
     var dx = (e.clientX - (r.left + r.width/2))  / (r.width/2);
     var dy = (e.clientY - (r.top  + r.height/2)) / (r.height/2);
-    card.style.transform   = 'perspective(1200px) rotateX('+(-dy*5)+'deg) rotateY('+(dx*5)+'deg) translateZ(8px)';
-    card.style.transition  = 'box-shadow 0.3s, transform 0.08s ease';
+    card.style.transform  = 'perspective(1200px) rotateX('+(-dy*5)+'deg) rotateY('+(dx*5)+'deg) translateZ(8px)';
+    card.style.transition = 'box-shadow 0.3s, transform 0.08s ease';
   };
   window.resetTilt = function(card){
     card.style.transform  = 'perspective(1200px) rotateX(0) rotateY(0) translateZ(0)';
     card.style.transition = 'box-shadow 0.5s, transform 0.5s ease';
   };
 
-  /* Tab ink + scroll-spy */
+  /* ── Tab ink + scroll-spy ── */
   var tabs = document.querySelectorAll('.exp-tab');
   var ink  = document.getElementById('expTabInk');
 
@@ -368,7 +402,7 @@ function handleSubmit(e) {
     });
   }, { passive:true });
 
-  /* Scroll reveal */
+  /* ── Scroll reveal ── */
   var section = document.getElementById('experiences');
   if (section) {
     new IntersectionObserver(function(e,o){ if(e[0].isIntersecting){ section.classList.add('exp-in'); o.disconnect(); }},{ threshold:0.06 }).observe(section);
@@ -377,7 +411,7 @@ function handleSubmit(e) {
     new IntersectionObserver(function(e,o){ if(e[0].isIntersecting){ el.classList.add('exp-cat-in'); o.disconnect(); }},{ threshold:0.1 }).observe(el);
   });
 
-  /* Init */
+  /* ── Init ── */
   [0,1,2].forEach(function(cat){ buildDots(cat); updateProgress(cat); });
 
 })();
