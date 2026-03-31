@@ -195,39 +195,40 @@ function handleSubmit(e) {
 })();
 
 /* ════════════════════════════════════════════════════
-   EXPERIENCES SECTION — Luxury v4 Script
-   Smooth scroll: CSS snap does all the snapping.
-   JS only reads position after scrollend (or fallback
-   timeout) — never fights the browser mid-scroll.
+   EXPERIENCES SECTION
+   Desktop  (>900px): CSS grid, all 4 cards visible, no scroll.
+   Tablet (601-900px): native flex scroll + CSS snap.
+   Mobile   (≤600px):  native scroll-snap. JS intercepts touch
+                        to enforce exactly one card per swipe.
 ════════════════════════════════════════════════════ */
 
 (function () {
 
-  var CARD_GAP = 18;
-
   var state = [
-    { idx:0, dragging:false, startX:0, scrollStart:0, scrollTimer:null },
-    { idx:0, dragging:false, startX:0, scrollStart:0, scrollTimer:null },
-    { idx:0, dragging:false, startX:0, scrollStart:0, scrollTimer:null },
+    { idx:0, startX:0, startY:0, locked:null, swiping:false, scrollTimer:null, dragging:false, scrollStart:0 },
+    { idx:0, startX:0, startY:0, locked:null, swiping:false, scrollTimer:null, dragging:false, scrollStart:0 },
+    { idx:0, startX:0, startY:0, locked:null, swiping:false, scrollTimer:null, dragging:false, scrollStart:0 },
   ];
 
   function getTrack(cat)     { return document.getElementById('track-' + cat); }
   function getCardCount(cat) { var t = getTrack(cat); return t ? t.querySelectorAll('.exp-card').length : 0; }
+  function isMobile()        { return window.innerWidth <= 600; }
 
-  /* Measure real rendered card width every time — respects mobile flex-basis */
-  function getStep(cat) {
+  function getCardWidth(cat) {
+    /* On mobile cards are 100vw; on tablet measure actual card */
+    if (isMobile()) return window.innerWidth;
     var t = getTrack(cat); if (!t) return 308;
     var card = t.querySelector('.exp-card');
-    if (!card) return 308;
-    return card.offsetWidth + CARD_GAP;
+    return card ? card.offsetWidth + 18 : 308;
   }
 
   function getVisible(cat) {
+    if (isMobile()) return 1;
     var t = getTrack(cat); if (!t) return 1;
-    return Math.max(1, Math.floor(t.clientWidth / getStep(cat)));
+    return Math.max(1, Math.floor(t.clientWidth / getCardWidth(cat)));
   }
 
-  /* ── UI updates ── */
+  /* ── UI ── */
   function updateProgress(cat) {
     var bar = document.getElementById('prog-' + cat); if (!bar) return;
     var max = Math.max(1, getCardCount(cat) - getVisible(cat));
@@ -252,99 +253,132 @@ function handleSubmit(e) {
     });
   }
 
-  /* ── Core navigation: let CSS smooth-scroll + snap do the work ── */
+  /* ── Core navigation ── */
   function goTo(cat, idx) {
     var max = getCardCount(cat) - 1;
     idx = Math.max(0, Math.min(idx, max));
     state[cat].idx = idx;
-    var t    = getTrack(cat);
-    var step = getStep(cat);
-    /* CSS scroll-behavior:smooth + scroll-snap-type handles the animation.
-       We just set the target position. */
-    t.scrollTo({ left: idx * step, behavior: 'smooth' });
+    var t = getTrack(cat);
+    var w = getCardWidth(cat);
+    t.scrollTo({ left: idx * w, behavior: 'smooth' });
     updateDots(cat);
     updateProgress(cat);
   }
 
   window.slide = function(cat, dir){ goTo(cat, state[cat].idx + dir); };
 
-  /* ── Mouse drag (desktop only) ──
-     During drag: temporarily disable scroll-snap so the track
-     follows the finger freely. Re-enable and snap on release. */
+  /* ── Desktop mouse drag (tablet/desktop only) ── */
   window.dragStart = function(e, cat){
-    if (window.innerWidth <= 600) return;
+    if (isMobile()) return;
     var t = getTrack(cat);
     state[cat].dragging    = true;
     state[cat].startX      = e.pageX;
     state[cat].scrollStart = t.scrollLeft;
-    /* Disable snap while dragging so it doesn't fight the mouse */
     t.style.scrollSnapType = 'none';
     t.style.scrollBehavior = 'auto';
     t.classList.add('dragging');
   };
-
   window.dragMove = function(e, cat){
     if (!state[cat].dragging) return;
     e.preventDefault();
     getTrack(cat).scrollLeft = state[cat].scrollStart - (e.pageX - state[cat].startX);
   };
-
   window.dragEnd = function(cat){
     if (!state[cat].dragging) return;
     state[cat].dragging = false;
-    var t    = getTrack(cat);
-    var step = getStep(cat);
-    var idx  = Math.round(t.scrollLeft / step);
-    /* Re-enable snap, then animate to the snapped position */
+    var t = getTrack(cat);
+    var w = getCardWidth(cat);
+    var idx = Math.round(t.scrollLeft / w);
     t.style.scrollSnapType = '';
     t.style.scrollBehavior = '';
     t.classList.remove('dragging');
     goTo(cat, idx);
   };
 
-  /* ── Touch (mobile): let native scroll-snap handle everything ──
-     We don't manually move scrollLeft on touch — the browser's
-     momentum scroll + snap is silky on iOS/Android by itself. */
-  window.touchStart = function(e, cat){
-    /* Just record for potential swipe detection — no scrollLeft overrides */
-    state[cat].startX      = e.touches[0].pageX;
-    state[cat].scrollStart = getTrack(cat).scrollLeft;
-    state[cat].dragging    = true;
-  };
+  /* ── HTML attribute stubs — real touch logic below ── */
+  window.touchStart = function(e, cat){};
+  window.touchMove  = function(e, cat){};
 
-  window.touchMove = function(e, cat){
-    /* Do nothing — let the browser handle touch scrolling natively.
-       Overriding scrollLeft here is what caused the glitch. */
-  };
+  /* ── Mobile touch: one card per swipe, enforced by JS ── */
+  function bindMobileTouch(cat) {
+    var t = getTrack(cat);
+    if (!t) return;
 
-  /* ── Read index after scroll settles ──
-     'scrollend' is modern; timeout fallback for older browsers.
-     We only READ here — never write scrollLeft — so no fighting. */
-  [0,1,2].forEach(function(cat){
-    var t = getTrack(cat); if (!t) return;
-
-    function onScrollSettle() {
-      var step = getStep(cat);
-      var idx  = Math.round(t.scrollLeft / step);
-      idx = Math.max(0, Math.min(idx, getCardCount(cat) - 1));
-      if (state[cat].idx !== idx) {
-        state[cat].idx = idx;
-        updateDots(cat);
-        updateProgress(cat);
-      }
-    }
-
-    /* Modern browsers: fires once scroll animation fully ends */
-    if ('onscrollend' in t) {
-      t.addEventListener('scrollend', onScrollSettle, { passive: true });
-    }
-
-    /* Fallback: debounce the scroll event — wait 120ms of silence */
-    t.addEventListener('scroll', function(){
-      clearTimeout(state[cat].scrollTimer);
-      state[cat].scrollTimer = setTimeout(onScrollSettle, 120);
+    t.addEventListener('touchstart', function(e) {
+      if (!isMobile()) return;
+      state[cat].startX   = e.touches[0].clientX;
+      state[cat].startY   = e.touches[0].clientY;
+      state[cat].swiping  = true;
+      state[cat].locked   = null;
+      /* Freeze scroll at current card position to prevent drift */
+      t.style.overflowX = 'hidden';
     }, { passive: true });
-  });
+
+    t.addEventListener('touchmove', function(e) {
+      if (!isMobile() || !state[cat].swiping) return;
+      var dx = e.touches[0].clientX - state[cat].startX;
+      var dy = e.touches[0].clientY - state[cat].startY;
+      if (!state[cat].locked && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
+        state[cat].locked = Math.abs(dx) >= Math.abs(dy) ? 'h' : 'v';
+      }
+      if (state[cat].locked === 'h') {
+        /* Prevent page scroll AND track scroll — we'll move programmatically */
+        e.preventDefault();
+      } else {
+        /* Vertical scroll — release the track */
+        t.style.overflowX = 'scroll';
+      }
+    }, { passive: false });
+
+    t.addEventListener('touchend', function(e) {
+      if (!isMobile() || !state[cat].swiping) return;
+      state[cat].swiping = false;
+      /* Re-enable scroll */
+      t.style.overflowX = 'scroll';
+
+      if (state[cat].locked !== 'h') return;
+
+      var dx = e.changedTouches[0].clientX - state[cat].startX;
+      /* Any swipe over 25px moves exactly ONE card */
+      if (Math.abs(dx) < 25) return;
+      goTo(cat, state[cat].idx + (dx < 0 ? 1 : -1));
+    }, { passive: true });
+
+    /* Sync dots when native scroll settles (dot clicks, etc.) */
+    t.addEventListener('scroll', function() {
+      clearTimeout(state[cat].scrollTimer);
+      state[cat].scrollTimer = setTimeout(function() {
+        if (!isMobile()) return;
+        var w   = getCardWidth(cat);
+        var idx = Math.round(t.scrollLeft / w);
+        idx = Math.max(0, Math.min(idx, getCardCount(cat) - 1));
+        if (state[cat].idx !== idx) {
+          state[cat].idx = idx;
+          updateDots(cat);
+          updateProgress(cat);
+        }
+      }, 80);
+    }, { passive: true });
+  }
+
+  /* ── Tablet: sync dots after native scroll ── */
+  function bindTabletScroll(cat) {
+    var t = getTrack(cat); if (!t) return;
+    t.addEventListener('scroll', function() {
+      clearTimeout(state[cat].scrollTimer);
+      state[cat].scrollTimer = setTimeout(function() {
+        if (isMobile()) return;
+        var w   = getCardWidth(cat);
+        var idx = Math.round(t.scrollLeft / w);
+        idx = Math.max(0, Math.min(idx, getCardCount(cat) - 1));
+        if (state[cat].idx !== idx) {
+          state[cat].idx = idx;
+          updateDots(cat);
+          updateProgress(cat);
+        }
+      }, 120);
+    }, { passive: true });
+  }
 
   /* ── 3D tilt (desktop only) ── */
   window.tiltCard = function(e, card){
@@ -412,9 +446,15 @@ function handleSubmit(e) {
   });
 
   /* ── Init ── */
-  [0,1,2].forEach(function(cat){ buildDots(cat); updateProgress(cat); });
+  [0,1,2].forEach(function(cat){
+    buildDots(cat);
+    updateProgress(cat);
+    bindMobileTouch(cat);
+    bindTabletScroll(cat);
+  });
 
 })();
+
 
 /* ════════════════════════════════════════════════════
    CONTACT SECTION — Script

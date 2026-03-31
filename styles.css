@@ -1299,6 +1299,27 @@ nav.scrolled .nav-burger span { background: #F9F5EF; }
   background: #551516;
 }
 
+/* Mobile: circular dots, centred, no progress bar */
+@media (max-width: 600px) {
+  .exp-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(85,21,22,0.2);
+    transition: background 0.3s, transform 0.3s;
+  }
+  .exp-dot.active {
+    width: 8px;
+    border-radius: 50%;
+    background: #551516;
+    transform: scale(1.3);
+  }
+  .exp-progress {
+    justify-content: center;
+    gap: 8px;
+  }
+}
+
 /* ── CTA ── */
 .exp-cta {
   display: flex;
@@ -1382,24 +1403,45 @@ nav.scrolled .nav-burger span { background: #F9F5EF; }
   .exp-cat-banner { padding: 14px 20px; flex-wrap: wrap; gap: 10px; }
   .exp-cat-count { display: none; }
 
-  /* One full card + peek of next — consistent on every phone */
+  /* Mobile: native scroll-snap — simplest, most reliable approach */
   .exp-track {
     display: flex;
     grid-template-columns: none;
-    overflow-x: auto;
+    overflow-x: scroll;
     scroll-snap-type: x mandatory;
-    scroll-padding-left: 20px;
-    padding: 18px 20px 22px;
-    gap: 14px;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    padding: 18px 0 22px;
+    gap: 0;
+    position: relative;
+    /* Hide scrollbar visually */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
+  .exp-track::-webkit-scrollbar { display: none; }
   .exp-card {
-    flex: 0 0 calc(100vw - 54px);
-    width: calc(100vw - 54px);
+    /* Each card takes exactly the full viewport width */
+    flex: 0 0 100vw;
+    width: 100vw;
     height: 390px;
-    transform: none !important;
+    scroll-snap-align: start;
+    /* Visual inset via padding so card doesn't touch screen edges */
+    padding: 0 20px;
+    box-sizing: border-box;
+    border-radius: 0;
+    position: relative;
+    overflow: visible;
+  }
+  /* The link inside is the actual visible card */
+  .exp-card .exp-card-link {
+    border-radius: 8px;
+    overflow: hidden;
+    height: 100%;
   }
   .exp-media { height: 200px; }
-  .exp-footer-row { padding: 0 20px 8px; }
+  /* Progress bar hidden on mobile — dots show position instead */
+  .exp-prog-wrap { display: none; }
+  .exp-footer-row { padding: 0 20px 8px; justify-content: center; }
   .exp-cta-btn { width: calc(100% - 40px); justify-content: center; padding: 16px 24px; }
   .exp-cursor { display: none; }
 }
