@@ -44,13 +44,16 @@ body {
 #navbar {
   position: fixed;
   top: 0; left: 0; right: 0;
-  z-index: 1000;
+  z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 48px;
   height: var(--nav-h);
-  transition: background .4s, box-shadow .4s;
+  transition: background 0.4s, box-shadow 0.4s;
+
+  background: transparent; 
+  backdrop-filter: none;    
 }
 
 #navbar.scrolled {
@@ -99,7 +102,7 @@ body {
   transition: color 0.3s;
 }
 
-nav.scrolled .nav-links a { color: #a7703a; }
+#navbar.scrolled .nav-links a { color: #a7703a; }
 .nav-links :hover a { color: #551516; }
 
 .nav-links li a.nav-cta {
@@ -133,11 +136,11 @@ nav.scrolled .nav-links a { color: #a7703a; }
   display: block;
   width: 22px;
   height: 1.5px;
-  background: #551516;
+  background: var(--cream);
   transition: background 0.4s;
 }
 
-nav.scrolled .nav-burger span { background: var(--text-mid); }
+#navbar.scrolled .nav-burger span { background: var(--cream); }
 
 /* Mobile nav open state */
 .nav-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
@@ -1450,38 +1453,68 @@ nav.scrolled .nav-burger span { background: var(--text-mid); }
     <div class="sec-rule"><span class="bar"></span><span class="dot"></span></div>
   </div>
   <div class="reviews-summary">
-    <span class="score-big">4.8</span>
+    <span class="score-big">4.9</span>
     <div class="score-right">
       <div class="stars">★★★★★</div>
-      <span>Based on 214 verified reviews</span>
+      <span>Based on 176 verified reviews</span>
     </div>
   </div>
-
   <div class="reviews-grid">
 
     <div class="rv-card">
-      <div class="rv-name">Kevin Mwangi</div>
-      <p class="rv-text">Marafa Canyon was unreal. The colors and formations are something you don’t expect in Kenya.</p>
+      <div class="rv-top">
+        <div class="rv-avatar">👨🏽</div>
+        <div>
+          <div class="rv-name">Eric Muthoni</div>
+          <div class="rv-loc">Thika, Kenya</div>
+        </div>
+      </div>
+      <div class="rv-stars">★★★★★</div>
+      <p class="rv-text">Golden Sands was stunning — soft white beaches and crystal clear water. It was the perfect place to relax and unwind.</p>
+      <span class="rv-date">March 2025</span>
     </div>
 
     <div class="rv-card">
-      <div class="rv-name">Lisa Carter</div>
-      <p class="rv-text">Perfect mix of adventure and relaxation. The island at the end was the highlight.</p>
+      <div class="rv-top">
+        <div class="rv-avatar">👩🏾</div>
+        <div>
+          <div class="rv-name">Zuwena Bakari</div>
+          <div class="rv-loc">Malindi, Kenya</div>
+        </div>
+      </div>
+      <div class="rv-stars">★★★★★</div>
+      <p class="rv-text">Marafa Dunes were absolutely magical at sunset. The changing colors of the sand created a surreal and unforgettable experience.</p>
+      <span class="rv-date">February 2025</span>
     </div>
 
     <div class="rv-card">
-      <div class="rv-name">Fatma Ali</div>
-      <p class="rv-text">Loved the dunes and the stories behind the canyon. Very unique experience.</p>
+      <div class="rv-top">
+        <div class="rv-avatar">👨🏻</div>
+        <div>
+          <div class="rv-name">Thomas Weber</div>
+          <div class="rv-loc">Munich, Germany</div>
+        </div>
+      </div>
+      <div class="rv-stars">★★★★☆</div>
+      <p class="rv-text">A great mix of beach and desert scenery. Relaxing by the ocean and then exploring the dunes made the trip very unique.</p>
+      <span class="rv-date">November 2024</span>
     </div>
 
     <div class="rv-card">
-      <div class="rv-name">Brian Otieno</div>
-      <p class="rv-text">Well organized and smooth from start to finish. Highly recommend.</p>
+      <div class="rv-top">
+        <div class="rv-avatar">👩🏼</div>
+        <div>
+          <div class="rv-name">Isabella Rossi</div>
+          <div class="rv-loc">Florence, Italy</div>
+        </div>
+      </div>
+      <div class="rv-stars">★★★★★</div>
+      <p class="rv-text">Watching the sunset over Marafa while feeling the ocean breeze earlier in the day was unforgettable. This experience is a must.</p>
+      <span class="rv-date">July 2024</span>
     </div>
 
   </div>
 </div>
-
 
   <!-- ⑦ SIMILAR DESTINATIONS -->
   <div class="similar-section">
@@ -1809,96 +1842,79 @@ window.addEventListener('scroll', () => {
   navbar.classList.toggle('scrolled', window.scrollY > 60);
 });
 
-
 /* ══════════════════════════════════════════════════
-   2.  HERO — populated from URL query params
-   
-   Expected params (all URL-encoded):
-     title  — experience title
-     desc   — short description
-     media  — path/URL to image or video file
-     type   — "image" | "video"
-     tag    — badge text e.g. "Full Day"
-   
-   Falls back gracefully if params are missing.
+   HERO — AUTO IMAGE / VIDEO DETECTION
 ══════════════════════════════════════════════════ */
 
 (function populateHero() {
 
-  const params = new URLSearchParams(window.location.search);
-  const title  = params.get('title');
-  const desc   = params.get('desc');
-  const media  = params.get('media');
-  const type   = (params.get('type') || 'image').toLowerCase();
-  const tag    = params.get('tag');
+  /* ── CHANGE ONLY THESE ── */
+  const title = "Golden Sands & Marafa Dunes";
+  const desc  = "Sculpted canyons, golden dunes, and island calm — one unforgettable coastal journey.";
+  const media = "images/Marafa.jpeg"; 
+  const tag   = "FULL DAY";
+
 
   /* ── Text ── */
-  if (title) {
-    document.getElementById('heroTitle').textContent = title;
-    document.title = title + ' — Crislynn Ventures';
-    const ot = document.getElementById('overviewTitle');
-    if (ot) ot.textContent = title;
-  }
+  document.getElementById('heroTitle').textContent = title;
+  document.title = title + ' — Crislynn Ventures';
 
-  if (desc) {
-    document.getElementById('heroDesc').textContent = desc;
-  }
+  const ot = document.getElementById('overviewTitle');
+  if (ot) ot.textContent = title;
 
-  /* ── Tag badge ── */
+  document.getElementById('heroDesc').textContent = desc;
+
   const tagEl = document.getElementById('heroTag');
-  if (tag) {
-    tagEl.textContent = tag;
-  } else {
-    tagEl.style.display = 'none';
-  }
+  tagEl.textContent = tag;
 
-  /* ── Media ── */
-  if (!media) return;   // nothing to do — fallback gradient stays
+
+  /* ── Detect media type automatically ── */
+  const isVideo = media.match(/\.(mp4|webm|ogg)$/i);
 
   const heroVideo = document.getElementById('heroVideo');
   const heroImage = document.getElementById('heroImage');
 
-  if (type === 'video') {
 
-    /* Must use <source> child so autoplay triggers properly in all browsers */
-    heroVideo.innerHTML = '';           // clear any old sources
+  if (isVideo) {
+
+    /* VIDEO MODE */
+    heroImage.style.display = "none";
+    heroVideo.style.display = "block";
+
+    heroVideo.innerHTML = '';
+
     const src = document.createElement('source');
     src.src  = media;
-    src.type = 'video/mp4';
+    src.type = "video/mp4";
     heroVideo.appendChild(src);
 
-    heroVideo.muted    = true;
-    heroVideo.autoplay = true;
-    heroVideo.loop     = true;
-    heroVideo.setAttribute('playsinline', '');
     heroVideo.load();
 
-    /* Show as soon as first frame is ready */
     heroVideo.addEventListener('loadeddata', function onLoaded() {
       heroVideo.classList.add('active');
       heroVideo.removeEventListener('loadeddata', onLoaded);
     });
 
-    /* Safety net: show after 1 s even if loadeddata is late */
     setTimeout(() => heroVideo.classList.add('active'), 1000);
 
   } else {
 
-    /* Image */
+    /* IMAGE MODE */
+    heroVideo.style.display = "none";
+    heroImage.style.display = "block";
+
     heroImage.src = media;
-    heroImage.alt = title || 'Experience';
+    heroImage.alt = title;
 
     heroImage.addEventListener('load', function onLoaded() {
       heroImage.classList.add('active');
       heroImage.removeEventListener('load', onLoaded);
     });
 
-    /* Safety net in case image is already cached */
     if (heroImage.complete && heroImage.naturalWidth > 0) {
       heroImage.classList.add('active');
     }
 
-    /* Safety net: show after 1 s anyway */
     setTimeout(() => heroImage.classList.add('active'), 1000);
   }
 

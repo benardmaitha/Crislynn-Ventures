@@ -44,13 +44,16 @@ body {
 #navbar {
   position: fixed;
   top: 0; left: 0; right: 0;
-  z-index: 1000;
+  z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 48px;
   height: var(--nav-h);
-  transition: background .4s, box-shadow .4s;
+  transition: background 0.4s, box-shadow 0.4s;
+
+  background: transparent; 
+  backdrop-filter: none;    
 }
 
 #navbar.scrolled {
@@ -99,7 +102,7 @@ body {
   transition: color 0.3s;
 }
 
-nav.scrolled .nav-links a { color: #a7703a; }
+#navbar.scrolled .nav-links a { color: #a7703a; }
 .nav-links :hover a { color: #551516; }
 
 .nav-links li a.nav-cta {
@@ -133,11 +136,11 @@ nav.scrolled .nav-links a { color: #a7703a; }
   display: block;
   width: 22px;
   height: 1.5px;
-  background: #551516;
+  background: var(--cream);
   transition: background 0.4s;
 }
 
-nav.scrolled .nav-burger span { background: var(--text-mid); }
+#navbar.scrolled .nav-burger span { background: var(--cream); }
 
 /* Mobile nav open state */
 .nav-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
@@ -1874,101 +1877,83 @@ window.addEventListener('scroll', () => {
   navbar.classList.toggle('scrolled', window.scrollY > 60);
 });
 
-
 /* ══════════════════════════════════════════════════
-   2.  HERO — populated from URL query params
-   
-   Expected params (all URL-encoded):
-     title  — experience title
-     desc   — short description
-     media  — path/URL to image or video file
-     type   — "image" | "video"
-     tag    — badge text e.g. "Full Day"
-   
-   Falls back gracefully if params are missing.
+   HERO — AUTO IMAGE / VIDEO DETECTION
 ══════════════════════════════════════════════════ */
 
 (function populateHero() {
 
-  const params = new URLSearchParams(window.location.search);
-  const title  = params.get('title');
-  const desc   = params.get('desc');
-  const media  = params.get('media');
-  const type   = (params.get('type') || 'image').toLowerCase();
-  const tag    = params.get('tag');
+  /* ── CHANGE ONLY THESE ── */
+  const title = "Bush to Beach — Mara & Malindi";
+  const desc  = "From the drama of the savannah to the calm of the ocean — the ultimate Kenyan contrast. Witness the iconic wildlife spectacle of the Maasai Mara, then unwind on Malindi's pristine beaches. A seamless blend of adventure and relaxation in one unforgettable journey.";
+  const media = "images/Mara2.jpg"; 
+  const tag   = "7 DAYS . 6 NIGHTS";
+
 
   /* ── Text ── */
-  if (title) {
-    document.getElementById('heroTitle').textContent = title;
-    document.title = title + ' — Crislynn Ventures';
-    const ot = document.getElementById('overviewTitle');
-    if (ot) ot.textContent = title;
-  }
+  document.getElementById('heroTitle').textContent = title;
+  document.title = title + ' — Crislynn Ventures';
 
-  if (desc) {
-    document.getElementById('heroDesc').textContent = desc;
-  }
+  const ot = document.getElementById('overviewTitle');
+  if (ot) ot.textContent = title;
 
-  /* ── Tag badge ── */
+  document.getElementById('heroDesc').textContent = desc;
+
   const tagEl = document.getElementById('heroTag');
-  if (tag) {
-    tagEl.textContent = tag;
-  } else {
-    tagEl.style.display = 'none';
-  }
+  tagEl.textContent = tag;
 
-  /* ── Media ── */
-  if (!media) return;   // nothing to do — fallback gradient stays
+
+  /* ── Detect media type automatically ── */
+  const isVideo = media.match(/\.(mp4|webm|ogg)$/i);
 
   const heroVideo = document.getElementById('heroVideo');
   const heroImage = document.getElementById('heroImage');
 
-  if (type === 'video') {
 
-    /* Must use <source> child so autoplay triggers properly in all browsers */
-    heroVideo.innerHTML = '';           // clear any old sources
+  if (isVideo) {
+
+    /* VIDEO MODE */
+    heroImage.style.display = "none";
+    heroVideo.style.display = "block";
+
+    heroVideo.innerHTML = '';
+
     const src = document.createElement('source');
     src.src  = media;
-    src.type = 'video/mp4';
+    src.type = "video/mp4";
     heroVideo.appendChild(src);
 
-    heroVideo.muted    = true;
-    heroVideo.autoplay = true;
-    heroVideo.loop     = true;
-    heroVideo.setAttribute('playsinline', '');
     heroVideo.load();
 
-    /* Show as soon as first frame is ready */
     heroVideo.addEventListener('loadeddata', function onLoaded() {
       heroVideo.classList.add('active');
       heroVideo.removeEventListener('loadeddata', onLoaded);
     });
 
-    /* Safety net: show after 1 s even if loadeddata is late */
     setTimeout(() => heroVideo.classList.add('active'), 1000);
 
   } else {
 
-    /* Image */
+    /* IMAGE MODE */
+    heroVideo.style.display = "none";
+    heroImage.style.display = "block";
+
     heroImage.src = media;
-    heroImage.alt = title || 'Experience';
+    heroImage.alt = title;
 
     heroImage.addEventListener('load', function onLoaded() {
       heroImage.classList.add('active');
       heroImage.removeEventListener('load', onLoaded);
     });
 
-    /* Safety net in case image is already cached */
     if (heroImage.complete && heroImage.naturalWidth > 0) {
       heroImage.classList.add('active');
     }
 
-    /* Safety net: show after 1 s anyway */
     setTimeout(() => heroImage.classList.add('active'), 1000);
   }
 
 })();
-
 
 /* ═══════════════════════════════════════════════
    3. GALLERY + LIGHTBOX — complete js
